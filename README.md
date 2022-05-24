@@ -12,6 +12,7 @@ create application at [link](https://dev.twitch.tv/console) with redirect uri ht
 open on your favorite browser this link
 ```https://id.twitch.tv/oauth2/authorize?response_type=token &client_id={clientId}&redirect_uri=http://localhost&scope=channel%3Amanage%3Apolls+channel%3Aread%3Apolls &state=c3ab8aa609ea11e793ae92361f002671```
 
+setup your twithc login and token on ```.env``` file
 ### Build
 
 ##### Building for windows set this environment variable
