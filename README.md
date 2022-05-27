@@ -1,4 +1,4 @@
-### Simple bot for twitch, who can speech message from chat
+### Simple bot for twitch, who can speech message from chat, NO required login
 
 ### Requirements
 
@@ -6,11 +6,68 @@ install
 [mplayer](http://www.mplayerhq.hu/design7/dload.html) and add mplayer binary to PATH variable
 
 ### setup .env file
-
-create application at [link](https://dev.twitch.tv/console) with redirect uri http://localhost
-
-open on your favorite browser this link
-```https://id.twitch.tv/oauth2/authorize?response_type=token &client_id={clientId}&redirect_uri=http://localhost&scope=channel%3Amanage%3Apolls+channel%3Aread%3Apolls &state=c3ab8aa609ea11e793ae92361f002671```
+supported language en,
+en-UK,
+en-AU,
+ja,
+de,
+es,
+ru,
+ar,
+bn,
+cs,
+da,
+nl,
+fi,
+el,
+hi,
+hu,
+id,
+km,
+la,
+it,
+no,
+pl,
+sk,
+sv,
+th,
+tr,
+uk,
+vi,
+af,
+bg,
+ca,
+cy,
+et,
+fr,
+gu,
+is,
+jv,
+kn,
+ko,
+lv,
+ml,
+mr,
+ms,
+ne,
+pt,
+ro,
+si,
+sr,
+su,
+ta,
+te,
+tl,
+ur,
+zh,
+sw,
+sq,
+my,
+mk,
+hy,
+hr,
+eo,
+bs
 
 ### Build
 

@@ -49,7 +49,6 @@ func (speech *Speech) PlaySpeechFile(fileName string) error {
 	if speech.Handler == nil {
 		mplayer := handlers.MPlayer{}
 		err := mplayer.Play(fileName)
-		fmt.Println(fileName)
 		speech.deleteFile( fileName)
 		return err
 	}
