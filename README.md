@@ -69,6 +69,7 @@ hr,
 eo,
 bs
 
+setup your twithc login and token on ```.env``` file
 ### Build
 
 ##### Building for windows set this environment variable
