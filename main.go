@@ -20,14 +20,11 @@ func main() {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
-
 	channels := os.Getenv("TWITCH_CHANNEL")
 	if len(channels) == 0 {
 		log.Fatal("Error loading .env file")
 	}
 	channelsList := strings.Split(channels, ",")
-
-	fmt.Println(channels)
 	language := os.Getenv("LANGUAGE")
 	if !voice.IsSupported(language) {
 		log.Fatal("Not supported language. ")
@@ -35,6 +32,9 @@ func main() {
 	moderationPair := os.Getenv("MODERATION")
 	ignoreString := os.Getenv("IGNORE")
 	volumeString := os.Getenv("VOLUME")
+	userIgnore := os.Getenv("USER_IGNORE")
+	usersList := strings.Split(userIgnore, ",")
+	usersList = append(usersList, channelsList...)
 	volume := 7
 	if len(volumeString) != 0 {
 		num, err := strconv.Atoi(volumeString)
@@ -44,20 +44,21 @@ func main() {
 		volume = num
 	}
 
+	filterDefault := moderation.NewFilterDefault(moderationPair, ignoreString)
+	urlFilter := moderation.NewUrlFilterDecorator(filterDefault)
+	userFilter := moderation.NewUserFilterDecorator(urlFilter, usersList)
+	service := voice.NewHtgoTtsService(language, userFilter, volume)
+	chatListener := handler.NewChatListener(service)
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
 
-	filterDefault := moderation.NewFilterDefault(moderationPair, ignoreString)
-	urlFilter := moderation.NewUrlFilterDecorator(filterDefault)
-	chatListener := handler.NewChatListener(voice.NewHtgoTtsService(language, urlFilter, volume))
 	shards := twitch.IRC()
 	shards.OnShardMessage(chatListener.OnShardMessage)
 	go chatListener.Handle()
 	log.Println("Started")
 	if err := shards.Join(channelsList...); err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
-
 	<-sc
 	err = os.Remove("audio")
 	fmt.Println(err)

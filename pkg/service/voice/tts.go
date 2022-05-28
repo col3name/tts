@@ -6,7 +6,12 @@ import (
 	"github.com/hegedustibor/htgo-tts/voices"
 )
 
+type SetterFromService interface {
+	SetFrom(from string)
+}
+
 type SpeechVoiceService interface {
+	SetterFromService
 	Speak(text string) error
 }
 
@@ -15,6 +20,7 @@ type HtgoTtsService struct {
 	language string
 	filter   moderation.Filter
 	volume   int
+	from     string
 }
 
 func NewHtgoTtsService(language string, filter moderation.Filter, volume int) *HtgoTtsService {
@@ -33,8 +39,12 @@ func NewHtgoTtsService(language string, filter moderation.Filter, volume int) *H
 	return h
 }
 
+func (s *HtgoTtsService) SetFrom(from string) {
+	s.from = from
+}
+
 func (s *HtgoTtsService) Speak(text string) error {
-	result := s.filter.Moderate(text)
+	result := s.filter.Moderate(moderation.Message{From: s.from, Text: text})
 	if len(result) < 3 {
 		return nil
 	}
