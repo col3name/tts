@@ -7,6 +7,7 @@
 - Url ignore
 - Sequential message reading
 - Supported about 60 language
+- Volume control
 
 ## Requirements
 
@@ -42,4 +43,4 @@ GOOS=darwin GOARCH=arm64
 
 ```make test```
 
-
+```https://translate.google.com/translate_tts?ie=UTF-8&total=1&idx=0&textlen=32&client=tw-ob&q=text+&tl=en```

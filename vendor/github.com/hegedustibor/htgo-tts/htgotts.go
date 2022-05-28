@@ -26,6 +26,7 @@ type Speech struct {
 	Folder   string
 	Language string
 	Handler  handlers.PlayerInterface
+	Volume   int
 }
 
 // Creates a speech file with a given name
@@ -47,9 +48,9 @@ func (speech *Speech) CreateSpeechFile(text string, fileName string) (string, er
 // Plays an existent .mp3 file
 func (speech *Speech) PlaySpeechFile(fileName string) error {
 	if speech.Handler == nil {
-		mplayer := handlers.MPlayer{}
+		mplayer := handlers.MPlayer{Volume: speech.Volume}
 		err := mplayer.Play(fileName)
-		speech.deleteFile( fileName)
+		speech.deleteFile(fileName)
 		return err
 	}
 
@@ -60,7 +61,11 @@ func (speech *Speech) PlaySpeechFile(fileName string) error {
 }
 
 func (speech *Speech) deleteFile(fileName string) {
-	err := os.Remove("C:\\Users\\mikha\\go\\src\\github.com\\col3name\\tts\\" + fileName)
+	path, err := os.Executable()
+	if err != nil {
+		fmt.Println(err)
+	}
+	err = os.Remove(path + "\\" + fileName)
 	if err != nil {
 		fmt.Println(err)
 	}

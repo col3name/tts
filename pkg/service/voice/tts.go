@@ -14,16 +14,21 @@ type HtgoTtsService struct {
 	speech   htgotts.Speech
 	language string
 	filter   moderation.Filter
+	volume   int
 }
 
-func NewHtgoTtsService(language string, filter moderation.Filter) *HtgoTtsService {
+func NewHtgoTtsService(language string, filter moderation.Filter, volume int) *HtgoTtsService {
 	h := new(HtgoTtsService)
 	if len(language) == 0 {
 		language = voices.English
 	}
+	if volume < 0 || volume > 15 {
+		return nil
+	}
 
 	h.language = language
-	h.speech = htgotts.Speech{Folder: "audio", Language: language}
+	h.volume = volume
+	h.speech = htgotts.Speech{Folder: "audio", Language: language, Volume: volume}
 	h.filter = filter
 	return h
 }

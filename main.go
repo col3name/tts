@@ -5,15 +5,13 @@ import (
 	"github.com/Adeithe/go-twitch"
 	"github.com/col3name/tts/pkg/handler"
 	"github.com/col3name/tts/pkg/service/moderation"
-	"strings"
-
-	//"github.com/col3name/tts/pkg/handler"
-	//"github.com/col3name/tts/pkg/service/moderation"
 	"github.com/col3name/tts/pkg/service/voice"
 	"github.com/joho/godotenv"
 	"log"
 	"os"
 	"os/signal"
+	"strconv"
+	"strings"
 	"syscall"
 )
 
@@ -36,13 +34,22 @@ func main() {
 	}
 	moderationPair := os.Getenv("MODERATION")
 	ignoreString := os.Getenv("IGNORE")
+	volumeString := os.Getenv("VOLUME")
+	volume := 7
+	if len(volumeString) != 0 {
+		num, err := strconv.Atoi(volumeString)
+		if err != nil {
+			log.Fatal(err)
+		}
+		volume = num
+	}
 
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
 
 	filterDefault := moderation.NewFilterDefault(moderationPair, ignoreString)
 	urlFilter := moderation.NewUrlFilterDecorator(filterDefault)
-	chatListener := handler.NewChatListener(voice.NewHtgoTtsService(language, urlFilter))
+	chatListener := handler.NewChatListener(voice.NewHtgoTtsService(language, urlFilter, volume))
 	shards := twitch.IRC()
 	shards.OnShardMessage(chatListener.OnShardMessage)
 	go chatListener.Handle()
