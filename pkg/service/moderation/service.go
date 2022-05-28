@@ -1,6 +1,7 @@
 package moderation
 
 import (
+	"net/url"
 	"strings"
 )
 
@@ -135,6 +136,82 @@ var DefaultFilterMap = FilterMap{
 	data: bannedWord,
 }
 
+type BaseFilterDecorator struct {
+	filter Filter
+}
+
+func (f *BaseFilterDecorator) SetFilterMap(filterMap FilterMap) {
+	f.filter.SetFilterMap(filterMap)
+}
+
+func (f *BaseFilterDecorator) Moderate(text string) string {
+	return f.filter.Moderate(text)
+}
+
+type UrlFilterDecorator struct {
+	BaseFilterDecorator
+}
+
+func NewUrlFilterDecorator(filter Filter) *UrlFilterDecorator {
+	return &UrlFilterDecorator{
+		BaseFilterDecorator{
+			filter: filter,
+		},
+	}
+}
+
+func (f *UrlFilterDecorator) SetFilterMap(filterMap FilterMap) {
+	f.filter.SetFilterMap(filterMap)
+}
+
+func (f *UrlFilterDecorator) isValidUrl(str string) bool {
+	_, err := url.ParseRequestURI(str)
+	if err != nil {
+		return false
+	}
+
+	u, err := url.Parse(str)
+	return err == nil && u.Scheme != "" && u.Host != ""
+}
+
+var mostPopularTLD = []string{
+	".com",
+	".net",
+	".org",
+	".de",
+	".icu",
+	".uk",
+	".ru",
+	".info",
+	".top",
+	".xyz",
+	".tk",
+	".cn",
+	".ga",
+	".cf",
+	".nl",
+}
+
+func (f *UrlFilterDecorator) isContainsTopLevelDomain(str string) bool {
+	for _, item := range mostPopularTLD {
+		if strings.Contains(str, item) {
+			return true
+		}
+	}
+	return false
+}
+
+func (f *UrlFilterDecorator) Moderate(text string) string {
+	split := strings.Split(text, " ")
+	var result string
+	for _, word := range split {
+		if !f.isValidUrl(word) && !f.isContainsTopLevelDomain(word) {
+			result += word + " "
+		}
+	}
+	return f.filter.Moderate(result)
+}
+
 type FilterDefault struct {
 	filterMap FilterMap
 }
@@ -167,6 +244,7 @@ func (f *FilterDefault) Moderate(text string) string {
 		} else {
 			result += word
 		}
+		result += " "
 	}
 
 	return result

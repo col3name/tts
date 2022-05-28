@@ -40,11 +40,12 @@ func main() {
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
 
-	wordsFilter := moderation.NewFilterDefault(moderationPair, ignoreString)
-
-	chatListener := handler.NewChatListener(voice.NewHtgoTtsService(language, wordsFilter))
+	filterDefault := moderation.NewFilterDefault(moderationPair, ignoreString)
+	urlFilter := moderation.NewUrlFilterDecorator(filterDefault)
+	chatListener := handler.NewChatListener(voice.NewHtgoTtsService(language, urlFilter))
 	shards := twitch.IRC()
 	shards.OnShardMessage(chatListener.OnShardMessage)
+	go chatListener.Handle()
 	log.Println("Started")
 	if err := shards.Join(channelsList...); err != nil {
 		panic(err)

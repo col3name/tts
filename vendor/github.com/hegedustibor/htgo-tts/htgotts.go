@@ -66,7 +66,6 @@ func (speech *Speech) deleteFile(fileName string) {
 	}
 }
 
-// Speak downloads speech and plays it using mplayer
 func (speech *Speech) Speak(text string) error {
 
 	var err error
@@ -80,9 +79,6 @@ func (speech *Speech) Speak(text string) error {
 	return speech.PlaySpeechFile(fileName)
 }
 
-/**
- * Create the folder if does not exists.
- */
 func (speech *Speech) createFolderIfNotExists(folder string) error {
 	dir, err := os.Open(folder)
 	if os.IsNotExist(err) {

@@ -19,7 +19,7 @@ type HtgoTtsService struct {
 func NewHtgoTtsService(language string, filter moderation.Filter) *HtgoTtsService {
 	h := new(HtgoTtsService)
 	if len(language) == 0 {
-		language = voices.Russian
+		language = voices.English
 	}
 
 	h.language = language
