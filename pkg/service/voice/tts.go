@@ -30,5 +30,8 @@ func NewHtgoTtsService(language string, filter moderation.Filter) *HtgoTtsServic
 
 func (s *HtgoTtsService) Speak(text string) error {
 	result := s.filter.Moderate(text)
+	if len(result) < 3 {
+		return nil
+	}
 	return s.speech.Speak(result)
 }

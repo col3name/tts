@@ -34,7 +34,7 @@ GOOS=linux GOARCH=amd64
 
 ##### Building for macos set this environment variable
 
-GOOS=darwin GOARCH=amd64
+GOOS=darwin GOARCH=arm64
 ```go build -o main main.go```
 ```chmod +x ./main```
 
