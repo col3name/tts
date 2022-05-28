@@ -12,8 +12,10 @@
 
 ## Requirements
 
-install
-[mplayer](http://www.mplayerhq.hu/design7/dload.html) and add mplayer binary to PATH variable
+#### Mplayer
+
+- Windows install [mplayer](http://www.mplayerhq.hu/design7/dload.html) and add mplayer binary to PATH variable
+- Ubuntu ```sudo apt update && sudo apt install mplayer```
 
 ### setup .env file
 
