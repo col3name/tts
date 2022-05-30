@@ -49,10 +49,14 @@ func main() {
 	}
 	usersList := strings.Split(userIgnore, ",")
 	usersList = append(usersList, channelsList...)
-	volume := 7
+	volume := 1.0
 	if len(volumeString) != 0 {
-		num, err := strconv.Atoi(volumeString)
+		num, err := strconv.ParseFloat(volumeString, 10)
 		ifNeedFatal(err)
+		if num < 0 || num > 2.0 {
+			log.Fatal("volume range [0; 2]")
+		}
+
 		volume = num
 	}
 	settingDB := model.SettingDB{
@@ -106,7 +110,7 @@ func main() {
 
 	filter := moderation.NewDefaultFilter(moderationPair, ignoreString, usersList)
 	detectionService := langdetection.NewLinguaDetectionService(langdetection.DefaultLanguages)
-	service := voice.NewHtgoTtsService(language, filter, volume, settingRepo, langDetectorEnabled, detectionService)
+	service := voice.NewGoTtsService(language, filter, volume, settingRepo, langDetectorEnabled, detectionService)
 	chatListener := handler.NewChatListener(service)
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)

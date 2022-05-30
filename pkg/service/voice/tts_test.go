@@ -10,7 +10,7 @@ import (
 func TestName(t *testing.T) {
 	detectionService := langdetection.NewLinguaDetectionService(langdetection.DefaultLanguages)
 
-	service := NewHtgoTtsService("", moderation.NewFilterDefault("", ""), 1, nil, true, detectionService)
+	service := NewGoTtsService("", moderation.NewFilterDefault("", ""), 1, nil, true, detectionService)
 	tests := []struct {
 		input    string
 		language string

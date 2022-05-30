@@ -54,5 +54,4 @@ func (r *SettingRepoImpl) SaveSettings(settings *model.SettingDB) error {
 	}
 	_, err = r.db.Exec(query, string(data))
 	return err
-
 }

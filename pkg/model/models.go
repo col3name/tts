@@ -14,7 +14,7 @@ type SettingDB struct {
 	LanguageDetectorEnabled bool
 	UserBanList             string
 	ChannelsToListen        string
-	Volume                  int
+	Volume                  float64
 }
 
 func (s *SettingDB) SetReplacementWordPair(filter moderation.FilterMap) {
