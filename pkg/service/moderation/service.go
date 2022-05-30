@@ -45,6 +45,12 @@ var mostPopularTLD = []string{
 	".nl",
 }
 
+func NewDefaultFilter(moderationPair, ignoreString string, users []string) *UserFilterDecorator {
+	filterDefault := NewFilterDefault(moderationPair, ignoreString)
+	urlFilter := NewUrlFilterDecorator(filterDefault)
+	return NewUserFilterDecorator(urlFilter, users)
+}
+
 type UserFilterDecorator struct {
 	BaseFilterDecorator
 	users map[string]struct{}
@@ -129,11 +135,13 @@ type FilterDefault struct {
 	filterMap FilterMap
 }
 
+const defaultIgnore = "shit,slut,spunk,whore,fuck,nigger,sex,pussy,queer,sh1t,wank,wtf,anal,bitch,poop,tosser,vagina,balls,Goddamn,muff,clitoris,knobend,knob end,ballsack,bastard,bum,penis,arse,dick,f u c k,God damn,pube,anus,cunt,fellate,feck,felching,lmao,nigga,omg,bollok,dildo,fag,homo,turd,bugger,buttplug,dyke,bollock,flange,blowjob,boob,crap,labia,scrotum,s hit,smegma,ass,biatch,coon,lmfao,boner,fudge packer,jizz,hell,jerk,piss,tit,twat,bloody,butt,damn,blow job,cock,fellatio,fudgepacker,prick"
+
 func NewFilterDefault(moderationPair, ignoreString string) *FilterDefault {
 	f := new(FilterDefault)
 	if len(moderationPair) > 0 || len(ignoreString) > 0 {
 		builder := FilterMapBuilderImpl{}
-		f.filterMap = *builder.Build(moderationPair, ignoreString)
+		f.filterMap = *builder.Build(moderationPair, ignoreString+defaultIgnore)
 	} else {
 		f.filterMap = DefaultFilterMap
 	}
@@ -151,7 +159,7 @@ func (f *FilterDefault) Moderate(msg Message) string {
 	var ok bool
 
 	for _, word := range words {
-		val, ok = f.filterMap.get(strings.ToLower(word))
+		val, ok = f.filterMap.Get(strings.ToLower(word))
 		if ok {
 			result += val
 		} else {

@@ -18,6 +18,6 @@ buildMacos: fmt
 	go build -o main main.go
 releaseMacos: buildMacos
 	rar a -r macos-arm64.rar main
-release: releaseWin releaseLinux releaseMacos
+release: test lint releaseWin releaseLinux releaseMacos
 test:
 	go test ./...

@@ -1,6 +1,9 @@
 package moderation
 
-import "strings"
+import (
+	"github.com/col3name/tts/pkg/util"
+	"strings"
+)
 
 type FilterMap struct {
 	data map[string]string
@@ -12,13 +15,28 @@ func NewFilterMap() *FilterMap {
 	return f
 }
 
-func (m *FilterMap) get(from string) (string, bool) {
+func (m *FilterMap) Get(from string) (string, bool) {
 	s, ok := m.data[from]
 	return s, ok
 }
 
-func (m *FilterMap) push(from, to string) {
+func (m *FilterMap) Range() map[string]string {
+	return m.data
+}
+func (m *FilterMap) String() string {
+	var result string
+	for key, value := range m.data {
+		result += key + ":" + value + ","
+	}
+	return result[:len(result)-1]
+}
+
+func (m *FilterMap) Set(from, to string) {
 	m.data[from] = to
+}
+
+func (m *FilterMap) Remove(from string) {
+	delete(m.data, from)
 }
 
 var bannedWord = map[string]string{"anal": "",
@@ -106,19 +124,19 @@ type FilterMapBuilder interface {
 type FilterMapBuilderImpl struct{}
 
 func (b *FilterMapBuilderImpl) Build(value string, ignoreString string) *FilterMap {
-	pairs := strings.Split(value, ",")
+	pairs := util.StrEnumerationToArray(value)
 	result := NewFilterMap()
 	for _, pair := range pairs {
 		splitPair := strings.Split(pair, ":")
 		if len(splitPair) != 2 {
 			return nil
 		}
-		result.push(strings.ToLower(splitPair[0]), strings.ToLower(splitPair[1]))
+		result.Set(strings.ToLower(splitPair[0]), strings.ToLower(splitPair[1]))
 	}
 
-	split := strings.Split(ignoreString, ",")
+	split := util.StrEnumerationToArray(ignoreString)
 	for _, ignore := range split {
-		result.push(strings.ToLower(ignore), "")
+		result.Set(strings.ToLower(ignore), "")
 	}
 
 	return result

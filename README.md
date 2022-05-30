@@ -9,6 +9,7 @@
 - Supported about 60 language
 - Volume control
 - User ban list
+- Automatic language detection
 
 ## Requirements
 
@@ -18,10 +19,12 @@
 - Ubuntu ```sudo apt update && sudo apt install mplayer```
 
 ### setup .env file
-
-supported language en, en-UK, en-AU, ja, de, es, ru, ar, bn, cs, da, nl, fi, el, hi, hu, id, km, la, it, no, pl, sk, sv,
-th, tr, uk, vi, af, bg, ca, cy, et, fr, gu, is, jv, kn, ko, lv, ml, mr, ms, ne, pt, ro, si, sr, su, ta, te, tl, ur, zh,
-sw, sq, my, mk, hy, hr, eo, bs
+[ISO language code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)
+- Supported speaking language without automatic detection: en, en-UK, en-AU, ja, de, es, ru, ar, bn, cs, da, nl, fi, el,
+  hi, hu, id, km, la, it, no, pl, sk, sv, th, tr, uk, vi, af, bg, ca, cy, et, fr, gu, is, jv, kn, ko, lv, ml, mr, ms,
+  ne, pt, ro, si, sr, su, ta, te, tl, ur, zh, sw, sq, my, mk, hy, hr, eo, bs
+- Supported automatic language detection: English (en), Spanish (es), French (fr), German (de), Russian (ru), Chinese (
+  zh)
 
 ## Build
 
@@ -43,4 +46,5 @@ GOOS=darwin GOARCH=arm64
 ```chmod +x ./main```
 
 ## Test
+
 ```make test```
