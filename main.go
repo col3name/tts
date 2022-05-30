@@ -2,13 +2,15 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"github.com/Adeithe/go-twitch"
 	"github.com/col3name/tts/pkg/handler"
-	httpTranposrt "github.com/col3name/tts/pkg/http"
+	transport2 "github.com/col3name/tts/pkg/http/transport"
 	"github.com/col3name/tts/pkg/model"
 	"github.com/col3name/tts/pkg/repo"
-	lang_detection "github.com/col3name/tts/pkg/service/lang-detection"
+	"github.com/col3name/tts/pkg/repo/sqlite"
+	langdetection "github.com/col3name/tts/pkg/service/lang-detection"
 	"github.com/col3name/tts/pkg/service/moderation"
 	"github.com/col3name/tts/pkg/service/voice"
 	"github.com/joho/godotenv"
@@ -69,41 +71,41 @@ func main() {
 		ChannelsToListen: "",
 		Volume:           1,
 	}
-	config, err := ParseConfig()
-	ifNeedFatal(err)
-	fmt.Println(config.ServeRestAddress)
+	serveRestAddress := os.Getenv("SERVE_REST_ADDRESS")
+	if len(serveRestAddress) == 0 {
+		serveRestAddress = ":8000"
+	}
 
-	connector, err := repo.GetConnector(config.Config)
+	db, err := sql.Open("sqlite3", "./data.db")
 	ifNeedFatal(err)
-
-	pool, err := repo.NewConnectionPool(connector)
+	settingRepo, err := sqlite.NewSettingRepoImpl(db)
 	ifNeedFatal(err)
-	settingRepo := repo.NewSettingRepo(pool)
-	db, err := settingRepo.GetSettings()
+	out, err := settingRepo.GetSettings()
 	if err != nil {
 		log.Fatal(err)
 	}
-	settingDB.ReplacementWordPair = db.ReplacementWordPair
-	settingDB.IgnoreWords = db.IgnoreWords
-	settingDB.UserBanList = db.UserBanList
-	settingDB.ChannelsToListen = db.ChannelsToListen
-
+	if out != nil {
+		settingDB.ReplacementWordPair = out.ReplacementWordPair
+		settingDB.IgnoreWords = out.IgnoreWords
+		settingDB.UserBanList = out.UserBanList
+		settingDB.ChannelsToListen = out.ChannelsToListen
+	}
 	if err = settingRepo.SaveSettings(&settingDB); err != nil {
 		log.Fatal(err)
 	}
-	go func(setting *model.SettingDB, settingRepo repo.SettingRepo) {
-		router := httpTranposrt.NewRouter(settingRepo)
-		server := httpTranposrt.Server{}
+	go func(settingRepo repo.SettingRepo, serveRestAddress string) {
+		router := transport2.NewRouter(settingRepo)
+		server := transport2.Server{}
 		killSignalChan := server.GetKillSignalChan()
-		srv := server.StartServer(config.ServeRestAddress, router)
+		srv := server.StartServer(serveRestAddress, router)
 
 		server.WaitForKillSignal(killSignalChan)
 		err = srv.Shutdown(context.Background())
 		ifNeedFatal(err)
-	}(&settingDB, settingRepo)
+	}(settingRepo, serveRestAddress)
 
 	filter := moderation.NewDefaultFilter(moderationPair, ignoreString, usersList)
-	detectionService := lang_detection.NewLinguaDetectionService(lang_detection.DefaultLanguages)
+	detectionService := langdetection.NewLinguaDetectionService(langdetection.DefaultLanguages)
 	service := voice.NewHtgoTtsService(language, filter, volume, settingRepo, langDetectorEnabled, detectionService)
 	chatListener := handler.NewChatListener(service)
 	sc := make(chan os.Signal, 1)
