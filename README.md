@@ -1,6 +1,10 @@
 ### Simple bot for twitch, who can speech message from chat, NO required login
 
 ### Feature
+
+
+
+
 - Word replacements
 - Word ignore
 - Url ignore
