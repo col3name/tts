@@ -3,33 +3,35 @@ import WordPairList from "./WordPairList";
 import React from "react";
 
 function WordPair(props) {
+  const {title, subtitle, wordPairList, onUpdatePairs} = props;
+
   const onSubmitWordPair = (pair) => {
     if (pair.before.length < 1) {
       return
     }
-    const wordPair = [...props.wordPairList];
+    const wordPair = [...wordPairList];
     const filter = wordPair.find(item => item.before.toLowerCase() === pair.before);
     if (filter !== undefined) {
       return;
     }
     wordPair.push(pair);
-    props.onUpdatePairs(wordPair);
+    onUpdatePairs(wordPair);
   }
 
   const onRemovePair = (index) => {
-    const pairs = [...props.wordPairList];
+    const pairs = [...wordPairList];
     pairs.splice(index, 1);
-    props.onUpdatePairs(pairs);
+    onUpdatePairs(pairs);
   };
 
   return (
     <div>
-      <p>{props.title}</p>
+      <p>{title}</p>
       <WordPairForm onSubmitWordPair={onSubmitWordPair}/>
       <div>
-        <p>{props.subtitle}</p>
+        <p>{subtitle}</p>
         <WordPairList
-          pairList={props.wordPairList}
+          pairList={wordPairList}
           onDeletePair={onRemovePair}
         />
       </div>

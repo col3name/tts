@@ -1,4 +1,4 @@
-const ALL_LANGUAGES = [
+const ALL_SUPPORTED_LANGUAGES = [
   {
     "code": "en",
     "name": "en"
@@ -248,4 +248,4 @@ const ALL_LANGUAGES = [
     "name": "bs"
   }
 ]
-export default ALL_LANGUAGES;
+export default ALL_SUPPORTED_LANGUAGES;

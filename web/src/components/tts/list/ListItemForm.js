@@ -5,7 +5,7 @@ export default function ListItemForm(props) {
       props.onSubmit(e.target[0].value)
       e.target[0].value = '';
     }}>
-      <label htmlFor="input">
+      <label>
         {props.label}
         <input type="text" placeholder={props.label}/>
       </label>

@@ -34,7 +34,7 @@ function useSettingState() {
     channelsToListen,
     volume,
   ]);
-  const {setIsNeedUpdate} = useIsNeedUpdate(updateCallback);
+  const {isNeedUpdateWrapper} = useIsNeedUpdate(updateCallback);
 
   const {isLoading} = useGetSettings((setting) => {
     setChannelsToListen(setting.ChannelsToListen);
@@ -48,50 +48,42 @@ function useSettingState() {
 
   const onUpdateTwitchUsername = (username) => {
     setChannelsToListen(username);
-    setIsNeedUpdate(true);
+    isNeedUpdateWrapper();
   };
   const onUpdateIgnoreWordList = (list) => {
     setIgnoreWords(list);
-    setIsNeedUpdate(true);
+    isNeedUpdateWrapper();
   };
-
-  const onSelectLanguage = (lang) => {
+  const onUpdateLanguage = (lang) => {
     setLanguage(lang);
-    setIsNeedUpdate(true);
+    isNeedUpdateWrapper();
   };
-  const onAutoDetectEnabled = (isEnabled) => {
+  const onUpdateAutoDetectEnabled = (isEnabled) => {
     setLanguageDetectorEnabled(isEnabled);
-    setIsNeedUpdate(true);
+    isNeedUpdateWrapper();
   };
   const onUpdateReplacementWordPairs = (pairs) => {
     setReplacementWordPair(pairs)
-    setIsNeedUpdate(true);
+    isNeedUpdateWrapper();
   };
   const onUpdateUserBanList = (list) => {
     setUserBanList(list);
-    setIsNeedUpdate(true);
+    isNeedUpdateWrapper();
   };
   const onUpdateVolume = volume => {
     setVolume(volume)
-    setIsNeedUpdate(true);
+    isNeedUpdateWrapper();
   };
 
   return {
-    replacementWordPair,
-    ignoreWords,
-    language,
-    languageDetectorEnabled,
-    userBanList,
-    channelsToListen,
-    volume,
+    channelsToListen: {value: channelsToListen, onUpdate: onUpdateTwitchUsername},
+    ignoreWords: {value: ignoreWords, onUpdate: onUpdateIgnoreWordList},
+    language: {value: language, onUpdate: onUpdateLanguage},
+    languageDetectorEnabled: {value: languageDetectorEnabled, onUpdate: onUpdateAutoDetectEnabled},
+    replacementWordPair: {value: replacementWordPair, onUpdate: onUpdateReplacementWordPairs},
+    userBanList: {value: userBanList, onUpdate: onUpdateUserBanList},
+    volume: {value: volume, onUpdate: onUpdateVolume},
     isLoading,
-    onUpdateTwitchUsername,
-    onUpdateIgnoreWordList,
-    onSelectLanguage,
-    onAutoDetectEnabled,
-    onUpdateReplacementWordPairs,
-    onUpdateUserBanList,
-    onUpdateVolume,
   }
 }
 

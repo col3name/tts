@@ -1,9 +1,9 @@
 import axios from "axios";
-import {arrayToString, listPairToString, stringToArray, stringToListPair} from "../util/util";
+import {listPairToString, stringToArray, stringToListPair} from "../util/util";
 
 const url = 'http://localhost:8000/api/v1/settings';
 
-async function getSettings() {
+const getSettings = async () => {
   const resp = await axios.get(url);
   if (resp.status !== 200) {
     return []
@@ -21,14 +21,14 @@ async function getSettings() {
   };
 }
 
-async function saveSettingsReq(data) {
+const saveSettingsReq = async (data) => {
   const setting = {
     Id: 1,
     ReplacementWordPair: listPairToString(data.ReplacementWordPair),
-    IgnoreWords: arrayToString(data.IgnoreWords),
+    IgnoreWords: data.IgnoreWords.join(),
     Language: data.Language,
     LanguageDetectorEnabled: data.LanguageDetectorEnabled,
-    UserBanList: arrayToString(data.UserBanList),
+    UserBanList: data.UserBanList.join(),
     ChannelsToListen: data.ChannelsToListen,
     Volume: data.Volume,
   };
@@ -36,7 +36,6 @@ async function saveSettingsReq(data) {
 }
 
 const saveSettings = (setting) => {
-
   saveSettingsReq(setting).then(resp => {
     if (resp.status === 200) {
       console.log(resp);

@@ -1,13 +1,21 @@
 import React from "react";
-import ALL_LANGUAGES from "../../api/languages";
+import ALL_SUPPORTED_LANGUAGES from "../../api/languages";
 
 export default function Languages(props) {
-  const detectorEnabled = props.languageDetectorEnabled;
+  const {
+    language,
+    languageDetectorEnabled,
+    onSelectLanguage,
+    onAutoDetectEnabled
+  } = props;
 
   const langSelector = (languages) => {
     return <div>
       <label htmlFor="select">
-        <select value={props.language} onChange={(e) => props.onSelectLanguage(e.target.value)}>
+        <select value={language} onChange={(e) => {
+          onSelectLanguage(e.target.value)
+        }
+        }>
           {languages.map((lang) => (
             <option key={lang.code}
                     value={lang.code}>{lang.name}</option>
@@ -17,17 +25,19 @@ export default function Languages(props) {
     </div>
   }
 
-  let langSelectorHTML = detectorEnabled ?
+  const langSelectorHTML = languageDetectorEnabled ?
     "" :
-    langSelector(ALL_LANGUAGES);
+    langSelector(ALL_SUPPORTED_LANGUAGES);
 
   return (
     <div>
-      <p>Selected Language {props.language}</p>
-      <label htmlFor="input">
+      <p>Selected Language {language}</p>
+      <label>
         Language Detector Enabled
-        <input type="checkbox" value={detectorEnabled}
-               onChange={(e) => props.onAutoDetectEnabled(e.target.value !== 'true')}/>
+        <input type="checkbox" value={languageDetectorEnabled}
+               onChange={(e) => {
+                 onAutoDetectEnabled(e.target.value !== 'true')
+               }}/>
       </label>
       {langSelectorHTML}
     </div>

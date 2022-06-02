@@ -1,39 +1,30 @@
-const appendToList = (value, list, callback) => {
+const appendToList = (value, list) => {
   const temp = [...list];
   temp.push(value)
-  callback(temp);
+  return temp;
 }
 
-const deleteByIndex = (index, list, callback) => {
+const deleteByIndex = (index, list) => {
   const tempList = [...list];
   tempList.splice(index, 1);
-  callback(tempList);
 }
 
 const deleteLastSymbols = (str, count = 1) => {
-  return str.substring(0, str.length - count)
-}
-
-const arrayToString = (arr, delimiter = ',') => {
-  const reduce = arr.reduce((result, item) => {
-    if (item.length === 0) {
-      return result;
-    }
-    return result + item + delimiter;
-  }, '');
-  return reduce.substring(0, reduce.length - 1)
+  return str.substring(0, str.length - count);
 }
 
 const stringToArray = (string) => {
-  return string.includes(',') ? string.split(',').filter(item => item.length > 0) : []
+  return string.includes(',') ? string.split(',').filter(item => item.length > 0) : [];
 }
 
 const listPairToString = (listPair) => {
-  let wordPair = listPair.reduce((result, pair) => {
+  let wordPair = listPair.reduce((result, pair, index) => {
     if (pair.before.length === 0) {
-      return result
+      return result;
     }
-    return result + pair.before + ':' + pair.after + ','
+    const ok = index !== listPair.length - 1;
+    const str = ok ? ',' : ''
+    return result + pair.before + ':' + pair.after + str;
   }, '');
   while (wordPair[wordPair.length - 1] === ',') {
     wordPair = deleteLastSymbols(wordPair)
@@ -46,21 +37,17 @@ const stringToListPair = (string) => {
     string = deleteLastSymbols(string)
   }
   return string.split(',').map(pair => {
-    const split = pair.split(':');
+    const res = pair.split(':');
     return {
-      before: split[0],
-      after: split[1],
+      before: res[0],
+      after: res[1],
     }
   });
 }
 
-const delay = ms => new Promise(res => setTimeout(res, ms));
-
 export {
   appendToList,
   deleteByIndex,
-  delay,
-  arrayToString,
   deleteLastSymbols,
   stringToArray,
   listPairToString,

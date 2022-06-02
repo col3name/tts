@@ -4,22 +4,25 @@ import React from "react";
 import {appendToList, deleteByIndex} from "../../../util/util";
 
 export default function ListFormView(props) {
-  const onDeleteItem = (index) => deleteByIndex(index, props.list, props.callback);
+  const {title, label, list, minLength, onUpdate} = props;
+
+  const onDeleteItem = (index) => onUpdate(deleteByIndex(index, list));
+
   const onCreateItem = (item) => {
-    if (item.length < props.minLength) {
+    if (item.length < minLength) {
       return
     }
-    if (!props.list.includes(item.toLowerCase())) {
-      appendToList(item, props.list, props.callback);
+    if (!list.includes(item.toLowerCase())) {
+      onUpdate(appendToList(item, list))
     }
   };
 
   return (
     <div>
-      <p>{props.title}</p>
-      <ListItemForm label={props.label}
+      <p>{title}</p>
+      <ListItemForm label={label}
                     onSubmit={onCreateItem}/>
-      <ListView data={props.list}
+      <ListView data={list}
                 onDeletePair={onDeleteItem}
       />
     </div>

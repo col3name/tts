@@ -1,28 +1,32 @@
 import React, {useRef} from 'react';
 
 export default function WordPairForm(props) {
+  const {onSubmitWordPair} = props;
   const beforeInputEl = useRef(null);
 
   const onSubmit = (e) => {
     e.preventDefault();
-    const before = e.target[0].value;
-    const after = e.target[1].value;
+    const beforeElement = e.target[0];
+    const afterElement = e.target[1];
+
+    const before = beforeElement.value;
+    const after = afterElement.value;
     if (before.length < 2) {
       return
     }
-    props.onSubmitWordPair({
+    onSubmitWordPair({
       before: before,
       after: after
     })
-    e.target[0].value = '';
-    e.target[1].value = '';
+    beforeElement.value = '';
+    afterElement.value = '';
     beforeInputEl.current.focus();
   };
 
   return (
     <form onSubmit={onSubmit}>
       <div>
-        <label className="label" htmlFor="input">
+        <label className="label">
           <span>Before (word to replace)</span>
           <input
             ref={beforeInputEl}
@@ -32,7 +36,7 @@ export default function WordPairForm(props) {
         </label>
       </div>
       <div>
-        <label className="label" htmlFor="input">
+        <label className="label">
           <span>After (word to replace)</span>
           <input
             type="text"

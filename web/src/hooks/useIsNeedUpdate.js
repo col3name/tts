@@ -1,18 +1,22 @@
 import {useCallback, useEffect, useState} from "react";
 
 function useIsNeedUpdate(callback) {
-  const [isNeedSave, setIsNeedUpdate] = useState(false)
+  const [isNeedUpdate, setIsNeedUpdate] = useState(false)
 
   const effect = useCallback(() => {
-    if (isNeedSave) {
+    if (isNeedUpdate) {
       callback()
       setIsNeedUpdate(false);
     }
-  }, [isNeedSave, callback]);
-  useEffect(effect, [effect])
+  }, [isNeedUpdate, callback]);
+  useEffect(effect, [effect]);
+
+  const isNeedUpdateWrapper = () => {
+    setIsNeedUpdate(true);
+  }
 
   return {
-    setIsNeedUpdate,
+    isNeedUpdateWrapper,
   }
 }
 
