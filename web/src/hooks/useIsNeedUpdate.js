@@ -11,9 +11,10 @@ function useIsNeedUpdate(callback) {
   }, [isNeedUpdate, callback]);
   useEffect(effect, [effect]);
 
-  const isNeedUpdateWrapper = () => {
+  const isNeedUpdateWrapper = (handler) => {
+    handler();
     setIsNeedUpdate(true);
-  }
+  };
 
   return {
     isNeedUpdateWrapper,

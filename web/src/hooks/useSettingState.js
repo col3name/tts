@@ -47,32 +47,25 @@ function useSettingState() {
   });
 
   const onUpdateTwitchUsername = (username) => {
-    setChannelsToListen(username);
-    isNeedUpdateWrapper();
+    isNeedUpdateWrapper(() => setChannelsToListen(username));
   };
   const onUpdateIgnoreWordList = (list) => {
-    setIgnoreWords(list);
-    isNeedUpdateWrapper();
+    isNeedUpdateWrapper(() => setIgnoreWords(list));
   };
   const onUpdateLanguage = (lang) => {
-    setLanguage(lang);
-    isNeedUpdateWrapper();
+    isNeedUpdateWrapper(() => setLanguage(lang));
   };
   const onUpdateAutoDetectEnabled = (isEnabled) => {
-    setLanguageDetectorEnabled(isEnabled);
-    isNeedUpdateWrapper();
+    isNeedUpdateWrapper(() => setLanguageDetectorEnabled(isEnabled));
   };
   const onUpdateReplacementWordPairs = (pairs) => {
-    setReplacementWordPair(pairs)
-    isNeedUpdateWrapper();
+    isNeedUpdateWrapper(() => setReplacementWordPair(pairs));
   };
   const onUpdateUserBanList = (list) => {
-    setUserBanList(list);
-    isNeedUpdateWrapper();
+    isNeedUpdateWrapper(() => setUserBanList(list));
   };
   const onUpdateVolume = volume => {
-    setVolume(volume)
-    isNeedUpdateWrapper();
+    isNeedUpdateWrapper(() => setVolume(volume));
   };
 
   return {
