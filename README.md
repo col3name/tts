@@ -2,6 +2,8 @@
 
 ### Feature
 
+![drawing](docs/preview.png)
+
 - Word replacements
 - Word ignore
 - Url ignore
