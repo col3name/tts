@@ -1,9 +1,6 @@
 ### Simple bot for twitch, who can speech message from chat, NO required login
 
 ### Feature
-
-![drawing](docs/preview.png)
-
 - Word replacements
 - Word ignore
 - Url ignore
@@ -13,7 +10,9 @@
 - User ban list
 - Automatic language detection
 
-### setup .env file
+![drawing](docs/preview.png)
+
+### Supported languages
 [ISO language code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)
 - Supported speaking language without automatic detection: en, en-UK, en-AU, ja, de, es, ru, ar, bn, cs, da, nl, fi, el,
   hi, hu, id, km, la, it, no, pl, sk, sv, th, tr, uk, vi, af, bg, ca, cy, et, fr, gu, is, jv, kn, ko, lv, ml, mr, ms,
