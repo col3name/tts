@@ -13,7 +13,14 @@ type SettingController struct {
 	SettingRepo repo.SettingRepo
 }
 
-func (c *SettingController) GetSettings(w http.ResponseWriter, _ *http.Request) {
+func (c *SettingController) GetSettings(w http.ResponseWriter, req *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+	if (*req).Method == "OPTIONS" {
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
 	settings, err := c.SettingRepo.GetSettings()
 	if err != nil {
 		log.Println(err)

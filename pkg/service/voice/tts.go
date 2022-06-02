@@ -103,7 +103,11 @@ func (s *GoTtsService) Speak(text string) error {
 
 	result := s.filter.Moderate(moderation.Message{From: s.from, Text: text})
 	result = strings.Trim(result, " ")
-	check := result[len(s.from):]
+	fromLen := len(s.from)
+	if fromLen > len(result) && len(result) == 0 {
+		return nil
+	}
+	check := result[fromLen:]
 	if strings.HasSuffix(check, "say    !") {
 		return nil
 	}

@@ -6,15 +6,17 @@ import (
 	"fmt"
 	"github.com/Adeithe/go-twitch"
 	"github.com/col3name/tts/pkg/handler"
-	transport2 "github.com/col3name/tts/pkg/http/transport"
+	"github.com/col3name/tts/pkg/http/transport"
 	"github.com/col3name/tts/pkg/model"
 	"github.com/col3name/tts/pkg/repo"
 	"github.com/col3name/tts/pkg/repo/sqlite"
 	langdetection "github.com/col3name/tts/pkg/service/lang-detection"
 	"github.com/col3name/tts/pkg/service/moderation"
 	"github.com/col3name/tts/pkg/service/voice"
+	"github.com/inkeliz/gowebview"
 	"github.com/joho/godotenv"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"strconv"
@@ -97,9 +99,31 @@ func main() {
 	if err = settingRepo.SaveSettings(&settingDB); err != nil {
 		log.Fatal(err)
 	}
+	go func() {
+		fs := http.FileServer(http.Dir("./web/build"))
+		http.Handle("/", fs)
+
+		log.Print("Listening on :3000...")
+		err := http.ListenAndServe(":3000", nil)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
+	go func() {
+		config := gowebview.WindowConfig{Title: "Text to speech",
+			Size: &gowebview.Point{X: 800, Y: 800}, Visibility: gowebview.VisibilityMinimized}
+
+		w, err := gowebview.New(&gowebview.Config{URL: "http://localhost:3000", WindowConfig: &config})
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		defer w.Destroy()
+		w.Run()
+	}()
 	go func(settingRepo repo.SettingRepo, serveRestAddress string) {
-		router := transport2.NewRouter(settingRepo)
-		server := transport2.Server{}
+		router := transport.NewRouter(settingRepo)
+		server := transport.Server{}
 		killSignalChan := server.GetKillSignalChan()
 		srv := server.StartServer(serveRestAddress, router)
 

@@ -11,13 +11,6 @@
 - User ban list
 - Automatic language detection
 
-## Requirements
-
-#### Mplayer
-
-- Windows install [mplayer](http://www.mplayerhq.hu/design7/dload.html) and add mplayer binary to PATH variable
-- Ubuntu ```sudo apt update && sudo apt install mplayer```
-
 ### setup .env file
 [ISO language code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)
 - Supported speaking language without automatic detection: en, en-UK, en-AU, ja, de, es, ru, ar, bn, cs, da, nl, fi, el,
