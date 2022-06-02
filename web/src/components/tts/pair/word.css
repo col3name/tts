@@ -1,0 +1,11 @@
+.lists {
+    max-height: 300px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+.label,
+.lists__item {
+    display: flex;
+    justify-content: space-between;
+}
