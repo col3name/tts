@@ -104,22 +104,22 @@ func main() {
 		http.Handle("/", fs)
 
 		log.Print("Listening on :3000...")
-		err := http.ListenAndServe(":3000", nil)
+		err = http.ListenAndServe(":3000", nil)
 		if err != nil {
 			log.Fatal(err)
 		}
 	}()
 	go func() {
 		config := gowebview.WindowConfig{Title: "Text to speech",
-			Size: &gowebview.Point{X: 800, Y: 800}, Visibility: gowebview.VisibilityMinimized}
+			Size: &gowebview.Point{X: 800, Y: 800}}
 
-		w, err := gowebview.New(&gowebview.Config{URL: "http://localhost:3000", WindowConfig: &config})
+		webView, err := gowebview.New(&gowebview.Config{URL: "http://localhost:3000", WindowConfig: &config})
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		defer w.Destroy()
-		w.Run()
+		defer webView.Destroy()
+		webView.Run()
 	}()
 	go func(settingRepo repo.SettingRepo, serveRestAddress string) {
 		router := transport.NewRouter(settingRepo)
