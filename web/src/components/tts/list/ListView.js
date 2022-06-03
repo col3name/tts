@@ -1,9 +1,7 @@
 import './lists.css';
 import '../scrollbar/style.css';
 
-export default function ListView(props) {
-  const {data, onDeletePair} = props;
-
+export default function ListView({data, onDeletePair}) {
   return (
     <div className="lists">
       {data.map((item, index) => {

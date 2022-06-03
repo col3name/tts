@@ -1,13 +1,13 @@
-export default function ListItemForm(props) {
+export default function ListItemForm({label, onSubmit}) {
   return (
     <form onSubmit={(e) => {
       e.preventDefault();
-      props.onSubmit(e.target[0].value)
+      onSubmit(e.target[0].value)
       e.target[0].value = '';
     }}>
       <label>
-        {props.label}
-        <input type="text" placeholder={props.label}/>
+        {label}
+        <input type="text" placeholder={label}/>
       </label>
       <button type="submit">Save</button>
     </form>

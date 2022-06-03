@@ -1,7 +1,6 @@
 import React from "react";
 
-function VolumeInput(props) {
-  const {volume, onUpdateVolume} = props;
+function VolumeInput({volume, onUpdateVolume}) {
   const onChange = (e) => {
     onUpdateVolume(e.target.valueAsNumber)
   };

@@ -1,7 +1,6 @@
 import React, {useState} from "react";
 
-function UsernameForm(props) {
-  const {channelsToListen, onUpdateTwitchUsername} = props;
+function UsernameForm({channelsToListen, onUpdateTwitchUsername}) {
   const [localUsername, setLocalUsername] = useState(channelsToListen);
 
   const onSubmit = (e) => {

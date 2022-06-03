@@ -3,8 +3,7 @@ import ListView from "./ListView";
 import React from "react";
 import {appendToList, deleteByIndex} from "../../../util/util";
 
-export default function ListFormView(props) {
-  const {title, label, list, minLength, onUpdate} = props;
+export default function ListFormView({title, label, list, minLength, onUpdate}) {
 
   const onDeleteItem = (index) => onUpdate(deleteByIndex(index, list));
 

@@ -2,9 +2,7 @@ import WordPairForm from "./WordPairForm";
 import WordPairList from "./WordPairList";
 import React from "react";
 
-function WordPair(props) {
-  const {title, subtitle, wordPairList, onUpdatePairs} = props;
-
+function WordPair({title, subtitle, wordPairList, onUpdatePairs}) {
   const onSubmitWordPair = (pair) => {
     if (pair.before.length < 1) {
       return

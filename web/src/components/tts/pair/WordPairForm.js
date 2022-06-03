@@ -1,7 +1,6 @@
 import React, {useRef} from 'react';
 
-export default function WordPairForm(props) {
-  const {onSubmitWordPair} = props;
+export default function WordPairForm({onSubmitWordPair}) {
   const beforeInputEl = useRef(null);
 
   const onSubmit = (e) => {

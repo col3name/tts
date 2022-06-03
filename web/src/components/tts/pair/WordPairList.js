@@ -1,9 +1,7 @@
 import './word.css';
 import '../scrollbar/style.css';
 
-export default function WordPairList(props) {
-  const {pairList, onDeletePair} = props;
-
+export default function WordPairList({pairList, onDeletePair}) {
   return (
     <div className="lists">
       {pairList.map((pair, index) => {

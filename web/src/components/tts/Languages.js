@@ -1,14 +1,12 @@
 import React from "react";
 import ALL_SUPPORTED_LANGUAGES from "../../api/languages";
 
-export default function Languages(props) {
-  const {
-    language,
-    languageDetectorEnabled,
-    onSelectLanguage,
-    onAutoDetectEnabled
-  } = props;
-
+export default function Languages({
+                                    language,
+                                    languageDetectorEnabled,
+                                    onSelectLanguage,
+                                    onAutoDetectEnabled
+                                  }) {
   const langSelector = (languages) => {
     return <div>
       <label htmlFor="select">
