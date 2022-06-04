@@ -1,16 +1,16 @@
-import {useCallback, useState} from "react";
-import useGetSettings from "./useGetSettings";
+import {useCallback, useEffect, useState} from "react"
+import useGetSettings from "./useGetSettings"
+import {saveSettings} from "../api"
 import useIsNeedUpdate from "./useIsNeedUpdate";
-import {saveSettings} from "../api";
 
-function useSettingState() {
-  const [channelsToListen, setChannelsToListen] = useState('');
-  const [ignoreWords, setIgnoreWords] = useState([]);
-  const [language, setLanguage] = useState('en');
-  const [languageDetectorEnabled, setLanguageDetectorEnabled] = useState(false);
-  const [replacementWordPair, setReplacementWordPair] = useState([]);
-  const [userBanList, setUserBanList] = useState([]);
-  const [volume, setVolume] = useState(5);
+const useSettingState = () => {
+  const [channelsToListen, setChannelsToListen] = useState('')
+  const [ignoreWords, setIgnoreWords] = useState([])
+  const [language, setLanguage] = useState('en')
+  const [languageDetectorEnabled, setLanguageDetectorEnabled] = useState(false)
+  const [replacementWordPair, setReplacementWordPair] = useState([])
+  const [userBanList, setUserBanList] = useState([])
+  const [volume, setVolume] = useState(5)
 
   const updateCallback = useCallback(() => {
     const setting = {
@@ -22,9 +22,9 @@ function useSettingState() {
       UserBanList: userBanList,
       ChannelsToListen: channelsToListen,
       Volume: volume,
-    };
+    }
 
-    saveSettings(setting)
+    saveSettings(setting).then()
   }, [
     replacementWordPair,
     ignoreWords,
@@ -33,40 +33,44 @@ function useSettingState() {
     userBanList,
     channelsToListen,
     volume,
-  ]);
-  const {isNeedUpdateWrapper} = useIsNeedUpdate(updateCallback);
+  ])
 
-  const {isLoading} = useGetSettings((setting) => {
-    setChannelsToListen(setting.ChannelsToListen);
-    setIgnoreWords(setting.IgnoreWords);
-    setLanguage(setting.Language);
-    setLanguageDetectorEnabled(setting.LanguageDetectorEnabled);
-    setReplacementWordPair(setting.ReplacementWordPair);
-    setUserBanList(setting.UserBanList);
-    setVolume(setting.Volume);
-  });
+  const {needUpdate} = useIsNeedUpdate(updateCallback)
+
+  const {isLoading, data, error} = useGetSettings()
+
+  useEffect(() => {
+    setChannelsToListen(data.ChannelsToListen)
+    setIgnoreWords(data.IgnoreWords)
+    setLanguage(data.Language)
+    setLanguageDetectorEnabled(data.LanguageDetectorEnabled)
+    setReplacementWordPair(data.ReplacementWordPair)
+    setUserBanList(data.UserBanList)
+    setVolume(data.Volume)
+  }, [data, error])
 
   const onUpdateTwitchUsername = (username) => {
-    isNeedUpdateWrapper(() => setChannelsToListen(username));
-  };
+    needUpdate(() => setChannelsToListen(username))
+  }
   const onUpdateIgnoreWordList = (list) => {
-    isNeedUpdateWrapper(() => setIgnoreWords(list));
-  };
+    needUpdate(() => setIgnoreWords(list))
+  }
   const onUpdateLanguage = (lang) => {
-    isNeedUpdateWrapper(() => setLanguage(lang));
-  };
+    needUpdate(() => setLanguage(lang))
+  }
   const onUpdateAutoDetectEnabled = (isEnabled) => {
-    isNeedUpdateWrapper(() => setLanguageDetectorEnabled(isEnabled));
-  };
+    needUpdate(() => setLanguageDetectorEnabled(isEnabled))
+  }
   const onUpdateReplacementWordPairs = (pairs) => {
-    isNeedUpdateWrapper(() => setReplacementWordPair(pairs));
-  };
+    needUpdate(() => setReplacementWordPair(pairs))
+  }
   const onUpdateUserBanList = (list) => {
-    isNeedUpdateWrapper(() => setUserBanList(list));
-  };
+    console.log(list)
+    needUpdate(() => setUserBanList(list))
+  }
   const onUpdateVolume = volume => {
-    isNeedUpdateWrapper(() => setVolume(volume));
-  };
+    needUpdate(() => setVolume(volume))
+  }
 
   return {
     channelsToListen: {value: channelsToListen, onUpdate: onUpdateTwitchUsername},

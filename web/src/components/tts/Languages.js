@@ -1,12 +1,12 @@
-import React from "react";
-import ALL_SUPPORTED_LANGUAGES from "../../api/languages";
+import React from "react"
+import ALL_SUPPORTED_LANGUAGES from "../../api/languages"
 
-export default function Languages({
-                                    language,
-                                    languageDetectorEnabled,
-                                    onSelectLanguage,
-                                    onAutoDetectEnabled
-                                  }) {
+const Languages = ({
+                     language,
+                     languageDetectorEnabled,
+                     onSelectLanguage,
+                     onAutoDetectEnabled
+                   }) => {
   const langSelector = (languages) => {
     return <div>
       <label htmlFor="select">
@@ -25,7 +25,7 @@ export default function Languages({
 
   const langSelectorHTML = languageDetectorEnabled ?
     "" :
-    langSelector(ALL_SUPPORTED_LANGUAGES);
+    langSelector(ALL_SUPPORTED_LANGUAGES)
 
   return (
     <div>
@@ -40,4 +40,6 @@ export default function Languages({
       {langSelectorHTML}
     </div>
   )
-};
+}
+
+export default Languages

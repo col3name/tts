@@ -1,24 +1,24 @@
-import {useCallback, useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react"
 
-function useIsNeedUpdate(callback) {
+const useIsNeedUpdate = (callback) => {
   const [isNeedUpdate, setIsNeedUpdate] = useState(false)
 
   const effect = useCallback(() => {
     if (isNeedUpdate) {
       callback()
-      setIsNeedUpdate(false);
+      setIsNeedUpdate(false)
     }
-  }, [isNeedUpdate, callback]);
-  useEffect(effect, [effect]);
+  }, [isNeedUpdate, callback])
+  useEffect(effect, [effect])
 
-  const isNeedUpdateWrapper = (handler) => {
-    handler();
-    setIsNeedUpdate(true);
-  };
+  const needUpdate = (handler) => {
+    handler()
+    setIsNeedUpdate(true)
+  }
 
   return {
-    isNeedUpdateWrapper,
+    needUpdate,
   }
 }
 
-export default useIsNeedUpdate;
+export default useIsNeedUpdate

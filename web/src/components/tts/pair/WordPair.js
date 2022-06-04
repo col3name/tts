@@ -1,26 +1,26 @@
-import WordPairForm from "./WordPairForm";
-import WordPairList from "./WordPairList";
-import React from "react";
+import React from "react"
+import WordPairForm from "./WordPairForm"
+import WordPairList from "./WordPairList"
 
-function WordPair({title, subtitle, wordPairList, onUpdatePairs}) {
+const WordPair = ({title, subtitle, wordPairList, onUpdatePairs}) => {
   const onSubmitWordPair = (pair) => {
     if (pair.before.length < 1) {
       return
     }
-    const wordPair = [...wordPairList];
-    const filter = wordPair.find(item => item.before.toLowerCase() === pair.before);
+    const wordPair = [...wordPairList]
+    const filter = wordPair.find(item => item.before.toLowerCase() === pair.before)
     if (filter !== undefined) {
-      return;
+      return
     }
-    wordPair.push(pair);
-    onUpdatePairs(wordPair);
+    wordPair.push(pair)
+    onUpdatePairs(wordPair)
   }
 
   const onRemovePair = (index) => {
-    const pairs = [...wordPairList];
-    pairs.splice(index, 1);
-    onUpdatePairs(pairs);
-  };
+    const pairs = [...wordPairList]
+    pairs.splice(index, 1)
+    onUpdatePairs(pairs)
+  }
 
   return (
     <div>
@@ -37,4 +37,4 @@ function WordPair({title, subtitle, wordPairList, onUpdatePairs}) {
   )
 }
 
-export default WordPair;
+export default WordPair

@@ -1,12 +1,12 @@
-import React, {useState} from "react";
+import React, {useState} from "react"
 
-function UsernameForm({channelsToListen, onUpdateTwitchUsername}) {
-  const [localUsername, setLocalUsername] = useState(channelsToListen);
+const UsernameForm = ({channelsToListen, onUpdateTwitchUsername}) => {
+  const [localUsername, setLocalUsername] = useState(channelsToListen)
 
   const onSubmit = (e) => {
-    e.preventDefault();
+    e.preventDefault()
     onUpdateTwitchUsername(localUsername)
-  };
+  }
 
   return <form onSubmit={onSubmit}>
     <label>

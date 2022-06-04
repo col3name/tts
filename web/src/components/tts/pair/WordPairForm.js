@@ -1,15 +1,15 @@
-import React, {useRef} from 'react';
+import React, {useRef, useState} from 'react'
 
-export default function WordPairForm({onSubmitWordPair}) {
-  const beforeInputEl = useRef(null);
+const WordPairForm = ({onSubmitWordPair}) => {
+  const beforeInputEl = useRef(null)
+
+  const [before, setBefore] = useState("")
+  const [after, setAfter] = useState("")
 
   const onSubmit = (e) => {
-    e.preventDefault();
-    const beforeElement = e.target[0];
-    const afterElement = e.target[1];
-
-    const before = beforeElement.value;
-    const after = afterElement.value;
+    e.preventDefault()
+    console.log('before', before)
+    console.log('after', after)
     if (before.length < 2) {
       return
     }
@@ -17,10 +17,10 @@ export default function WordPairForm({onSubmitWordPair}) {
       before: before,
       after: after
     })
-    beforeElement.value = '';
-    afterElement.value = '';
-    beforeInputEl.current.focus();
-  };
+    setBefore('')
+    setAfter('')
+    beforeInputEl.current.focus()
+  }
 
   return (
     <form onSubmit={onSubmit}>
@@ -29,6 +29,8 @@ export default function WordPairForm({onSubmitWordPair}) {
           <span>Before (word to replace)</span>
           <input
             ref={beforeInputEl}
+            value={before}
+            onChange={e => setBefore(e.target.value)}
             type="text"
             placeholder="before"
           />
@@ -40,10 +42,14 @@ export default function WordPairForm({onSubmitWordPair}) {
           <input
             type="text"
             placeholder="after"
+            value={after}
+            onChange={e => setAfter(e.target.value)}
           />
         </label>
       </div>
       <button type="submit">Save</button>
     </form>
   )
-};
+}
+
+export default WordPairForm

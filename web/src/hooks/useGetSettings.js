@@ -1,22 +1,38 @@
-import {useCallback, useEffect, useState} from "react";
-import {getSettings as getSettingsReq} from "../api";
+import {useEffect, useState} from "react"
+import {getSettings as getSettingsReq} from "../api"
+import {stringToArray, stringToListPair} from "../util/util";
 
-function useGetSettings(callback) {
-  const [isLoading, setIsLoading] = useState(true);
+const useGetSettings = () => {
+  const [isLoading, setIsLoading] = useState(true)
 
-  const effect = useCallback(() => {
+  const [data, setData] = useState( {
+    ChannelsToListen: [],
+    IgnoreWords: [],
+    Language: '',
+    LanguageDetectorEnabled: false,
+    ReplacementWordPair: [],
+    UserBanList: [],
+    Volume: 1
+  })
+  const [error, setError] = useState(undefined)
+  useEffect(() => {
     const fetchData = async () => {
-      const data = await getSettingsReq();
-      callback(data);
-      setIsLoading(false);
+      const data = await getSettingsReq()
+      setData(data)
+      setIsLoading(false)
     }
-    fetchData();
-  }, [callback]);
-  useEffect(effect, []);
+    try {
+      fetchData()
+    } catch (e) {
+      setError(e)
+    }
+  }, [])
 
   return {
-    isLoading
+    isLoading,
+    data,
+    error
   }
 }
 
-export default useGetSettings;
+export default useGetSettings
