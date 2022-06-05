@@ -2,25 +2,17 @@ import React, {useEffect, useReducer, useState} from "react"
 import useGetSetting from "./useGetSetting"
 import {saveSettings} from "../../api"
 import {ACTIONS, reducer} from "./reducer";
+import {INITIAL_STATE} from "./default";
 
 const useSettingState = () => {
-  const [state, dispatch] = useReducer(reducer, {
-    Id: 1,
-    ReplacementWordPair: [],
-    IgnoreWords: [],
-    Language: 'en',
-    LanguageDetectorEnabled: true,
-    UserBanList: [],
-    ChannelsToListen: [],
-    Volume: 1,
-  })
+  const [state, dispatch] = useReducer(reducer, INITIAL_STATE)
 
   const [isFirst, setIsFirst] = useState(true);
   const {isLoading, data, error} = useGetSetting()
 
   useEffect(() => {
     if (!isLoading) {
-      dispatch({type: 'initState', payload: data})
+      dispatch({type: ACTIONS.INIT_STATE, payload: data})
     }
   }, [data, error])
 
@@ -36,7 +28,8 @@ const useSettingState = () => {
 
   return {
     channelsToListen: {
-      value: state.ChannelsToListen, onUpdate: (username) => {
+      value: state.ChannelsToListen,
+      onUpdate: (username) => {
         dispatch({type: ACTIONS.UPDATE_USERNAME, payload: username})
       }
     },
@@ -55,7 +48,8 @@ const useSettingState = () => {
       }
     },
     languageDetectorEnabled: {
-      value: state.LanguageDetectorEnabled, onUpdate: (isEnabled) => {
+      value: state.LanguageDetectorEnabled,
+      onUpdate: (isEnabled) => {
         dispatch({type: ACTIONS.UPDATE_LANGUAGE_DETECTOR_ENABLED, payload: isEnabled})
       }
     },

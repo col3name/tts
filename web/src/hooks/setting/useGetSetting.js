@@ -1,18 +1,11 @@
 import {useEffect, useState} from "react"
 import {getSettings as getSettingsReq} from "../../api"
+import {INITIAL_STATE} from "./default";
 
 const useGetSetting = () => {
   const [isLoading, setIsLoading] = useState(true)
 
-  const [data, setData] = useState({
-    ChannelsToListen: '',
-    IgnoreWords: [],
-    Language: '',
-    LanguageDetectorEnabled: false,
-    ReplacementWordPair: [],
-    UserBanList: [],
-    Volume: 1
-  })
+  const [data, setData] = useState(INITIAL_STATE)
   const [error, setError] = useState(undefined)
   useEffect(() => {
     const fetchData = async () => {
