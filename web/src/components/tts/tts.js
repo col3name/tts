@@ -18,7 +18,6 @@ const TextToSpeech = () => {
     isLoading,
   } = useSettingState()
 
-  console.log()
   if (isLoading) {
     return <div>Loading...</div>
   }
@@ -37,7 +36,8 @@ const TextToSpeech = () => {
         title="Add word replacement"
         subtitle="Word replacements"
         wordPairList={replacementWordPair.value}
-        onUpdatePairs={replacementWordPair.onUpdate}
+        onAddWordPair={replacementWordPair.onAddWordPair}
+        onRemovePair={replacementWordPair.onRemovePair}
       />
       <Languages
         language={language.value}
@@ -50,13 +50,17 @@ const TextToSpeech = () => {
         label="User for ban"
         minLength={4}
         list={userBanList.value}
-        onUpdate={userBanList.onUpdate}/>
+        onAddItem={user => userBanList.onAddItem(user)}
+        onRemoveItem={user => userBanList.onRemoveItem(user)}
+      />
       <ListFormView
         title="Ignore words"
         label="ignore word"
         minLength={2}
         list={ignoreWords.value}
-        onUpdate={ignoreWords.onUpdate}/>
+        onAddItem={word => ignoreWords.onAddWord(word)}
+        onRemoveItem={word => ignoreWords.onRemoveWord(word)}
+      />
     </>
   )
 }

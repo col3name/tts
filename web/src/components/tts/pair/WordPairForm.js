@@ -8,8 +8,6 @@ const WordPairForm = ({onSubmitWordPair}) => {
 
   const onSubmit = (e) => {
     e.preventDefault()
-    console.log('before', before)
-    console.log('after', after)
     if (before.length < 2) {
       return
     }

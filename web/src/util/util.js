@@ -1,10 +1,13 @@
-const appendToList = (value, list) => {
+const appendToList = (list, value) => {
   const temp = [...list]
   temp.push(value)
   return temp
 }
 
-const deleteByIndex = (index, list) => {
+const deleteByIndex = (list, index) => {
+  if (index < 0 || index >= list.length) {
+    return list
+  }
   const tempList = [...list]
   tempList.splice(index, 1)
   return tempList

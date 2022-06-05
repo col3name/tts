@@ -1,95 +1,86 @@
-import {useEffect, useState} from "react"
+import React, {useEffect, useReducer, useState} from "react"
 import useGetSetting from "./useGetSetting"
 import {saveSettings} from "../../api"
+import {ACTIONS, reducer} from "./reducer";
 
 const useSettingState = () => {
-  const [channelsToListen, setChannelsToListen] = useState('')
-  const [ignoreWords, setIgnoreWords] = useState([])
-  const [language, setLanguage] = useState('en')
-  const [languageDetectorEnabled, setLanguageDetectorEnabled] = useState(false)
-  const [replacementWordPair, setReplacementWordPair] = useState([])
-  const [userBanList, setUserBanList] = useState([])
-  const [volume, setVolume] = useState(5)
+  const [state, dispatch] = useReducer(reducer, {
+    Id: 1,
+    ReplacementWordPair: [],
+    IgnoreWords: [],
+    Language: 'en',
+    LanguageDetectorEnabled: true,
+    UserBanList: [],
+    ChannelsToListen: [],
+    Volume: 1,
+  })
 
   const [isFirst, setIsFirst] = useState(true);
-
-  const save = () => {
-    const setting = {
-      Id: 1,
-      ReplacementWordPair: replacementWordPair,
-      IgnoreWords: ignoreWords,
-      Language: language,
-      LanguageDetectorEnabled: languageDetectorEnabled,
-      UserBanList: userBanList,
-      ChannelsToListen: channelsToListen,
-      Volume: volume,
-    }
-
-    saveSettings(setting).then()
-  };
-
   const {isLoading, data, error} = useGetSetting()
 
   useEffect(() => {
-    setChannelsToListen(data.ChannelsToListen)
-    setIgnoreWords(data.IgnoreWords)
-    setLanguage(data.Language)
-    setLanguageDetectorEnabled(data.LanguageDetectorEnabled)
-    setReplacementWordPair(data.ReplacementWordPair)
-    setUserBanList(data.UserBanList)
-    setVolume(data.Volume)
+    if (!isLoading) {
+      dispatch({type: 'initState', payload: data})
+    }
   }, [data, error])
 
   useEffect(() => {
-    if (!isFirst) {
-      save()
+    if (!isFirst && !isLoading) {
+      saveSettings(state).then()
     } else {
       setIsFirst(false)
     }
   }, [
-    replacementWordPair,
-    ignoreWords,
-    language,
-    languageDetectorEnabled,
-    userBanList,
-    channelsToListen,
-    volume,
+    state,
   ])
 
   return {
     channelsToListen: {
-      value: channelsToListen, onUpdate: (username) => {
-        setChannelsToListen(username);
+      value: state.ChannelsToListen, onUpdate: (username) => {
+        dispatch({type: ACTIONS.UPDATE_USERNAME, payload: username})
       }
     },
     ignoreWords: {
-      value: ignoreWords, onUpdate: (list) => {
-        setIgnoreWords(list)
+      value: state.IgnoreWords,
+      onAddWord: (word) => {
+        dispatch({type: ACTIONS.ADD_IGNORE_WORD, payload: word})
+      },
+      onRemoveWord(word) {
+        dispatch({type: ACTIONS.REMOVE_IGNORE_WORD, payload: word})
       }
     },
     language: {
-      value: language, onUpdate: (lang) => {
-        setLanguage(lang)
+      value: state.Language, onUpdate: (lang) => {
+        dispatch({type: ACTIONS.UPDATE_LANGUAGE, payload: lang})
       }
     },
     languageDetectorEnabled: {
-      value: languageDetectorEnabled, onUpdate: (isEnabled) => {
-        setLanguageDetectorEnabled(isEnabled)
+      value: state.LanguageDetectorEnabled, onUpdate: (isEnabled) => {
+        dispatch({type: ACTIONS.UPDATE_LANGUAGE_DETECTOR_ENABLED, payload: isEnabled})
       }
     },
     replacementWordPair: {
-      value: replacementWordPair, onUpdate: (pairs) => {
-        setReplacementWordPair(pairs)
-      }
+      value: state.ReplacementWordPair,
+      onAddWordPair: (pair) => {
+        dispatch({type: ACTIONS.ADD_WORD_PAIR, payload: pair})
+      },
+      onRemovePair: (index) => {
+        dispatch({type: ACTIONS.REMOVE_WORD_PAIR, payload: index})
+      },
     },
     userBanList: {
-      value: userBanList, onUpdate: (list) => {
-        setUserBanList(list)
-      }
+      value: state.UserBanList,
+      onAddItem: (user) => {
+        dispatch({type: ACTIONS.ADD_USER_TO_BAN_LIST, payload: user})
+      },
+      onRemoveItem: (list) => {
+        dispatch({type: ACTIONS.REMOVE_USER_TO_BAN_LIST, payload: list})
+      },
     },
     volume: {
-      value: volume, onUpdate: volume => {
-        setVolume(volume)
+      value: state.Volume,
+      onUpdate: (volume) => {
+        dispatch({type: ACTIONS.UPDATE_VOLUME, payload: volume})
       }
     },
     isLoading,
