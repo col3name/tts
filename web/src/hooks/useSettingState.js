@@ -1,7 +1,6 @@
-import {useCallback, useEffect, useState} from "react"
+import {useEffect, useState} from "react"
 import useGetSettings from "./useGetSettings"
 import {saveSettings} from "../api"
-import useIsNeedUpdate from "./useIsNeedUpdate";
 
 const useSettingState = () => {
   const [channelsToListen, setChannelsToListen] = useState('')
@@ -12,7 +11,9 @@ const useSettingState = () => {
   const [userBanList, setUserBanList] = useState([])
   const [volume, setVolume] = useState(5)
 
-  const updateCallback = useCallback(() => {
+  const [isFirst, setIsFirst] = useState(true);
+
+  const save = () => {
     const setting = {
       Id: 1,
       ReplacementWordPair: replacementWordPair,
@@ -25,17 +26,7 @@ const useSettingState = () => {
     }
 
     saveSettings(setting).then()
-  }, [
-    replacementWordPair,
-    ignoreWords,
-    language,
-    languageDetectorEnabled,
-    userBanList,
-    channelsToListen,
-    volume,
-  ])
-
-  const {needUpdate} = useIsNeedUpdate(updateCallback)
+  };
 
   const {isLoading, data, error} = useGetSettings()
 
@@ -49,37 +40,58 @@ const useSettingState = () => {
     setVolume(data.Volume)
   }, [data, error])
 
-  const onUpdateTwitchUsername = (username) => {
-    needUpdate(() => setChannelsToListen(username))
-  }
-  const onUpdateIgnoreWordList = (list) => {
-    needUpdate(() => setIgnoreWords(list))
-  }
-  const onUpdateLanguage = (lang) => {
-    needUpdate(() => setLanguage(lang))
-  }
-  const onUpdateAutoDetectEnabled = (isEnabled) => {
-    needUpdate(() => setLanguageDetectorEnabled(isEnabled))
-  }
-  const onUpdateReplacementWordPairs = (pairs) => {
-    needUpdate(() => setReplacementWordPair(pairs))
-  }
-  const onUpdateUserBanList = (list) => {
-    console.log(list)
-    needUpdate(() => setUserBanList(list))
-  }
-  const onUpdateVolume = volume => {
-    needUpdate(() => setVolume(volume))
-  }
+  useEffect(() => {
+    if (!isFirst) {
+      save()
+    } else {
+      setIsFirst(false)
+    }
+  }, [
+    replacementWordPair,
+    ignoreWords,
+    language,
+    languageDetectorEnabled,
+    userBanList,
+    channelsToListen,
+    volume,
+  ])
 
   return {
-    channelsToListen: {value: channelsToListen, onUpdate: onUpdateTwitchUsername},
-    ignoreWords: {value: ignoreWords, onUpdate: onUpdateIgnoreWordList},
-    language: {value: language, onUpdate: onUpdateLanguage},
-    languageDetectorEnabled: {value: languageDetectorEnabled, onUpdate: onUpdateAutoDetectEnabled},
-    replacementWordPair: {value: replacementWordPair, onUpdate: onUpdateReplacementWordPairs},
-    userBanList: {value: userBanList, onUpdate: onUpdateUserBanList},
-    volume: {value: volume, onUpdate: onUpdateVolume},
+    channelsToListen: {
+      value: channelsToListen, onUpdate: (username) => {
+        setChannelsToListen(username);
+      }
+    },
+    ignoreWords: {
+      value: ignoreWords, onUpdate: (list) => {
+        setIgnoreWords(list)
+      }
+    },
+    language: {
+      value: language, onUpdate: (lang) => {
+        setLanguage(lang)
+      }
+    },
+    languageDetectorEnabled: {
+      value: languageDetectorEnabled, onUpdate: (isEnabled) => {
+        setLanguageDetectorEnabled(isEnabled)
+      }
+    },
+    replacementWordPair: {
+      value: replacementWordPair, onUpdate: (pairs) => {
+        setReplacementWordPair(pairs)
+      }
+    },
+    userBanList: {
+      value: userBanList, onUpdate: (list) => {
+        setUserBanList(list)
+      }
+    },
+    volume: {
+      value: volume, onUpdate: volume => {
+        setVolume(volume)
+      }
+    },
     isLoading,
   }
 }

@@ -16,7 +16,7 @@ const ListFormView = ({title, label, list, minLength, onUpdate}) => {
 
   return (
     <div>
-      <p>{title}</p>
+      <p>{title}: {list === undefined ? '' : list.length}</p>
       <ListItemForm label={label}
                     onSubmit={onCreateItem}/>
       <ListView data={list}

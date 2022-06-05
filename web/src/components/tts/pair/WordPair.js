@@ -27,7 +27,7 @@ const WordPair = ({title, subtitle, wordPairList, onUpdatePairs}) => {
       <p>{title}</p>
       <WordPairForm onSubmitWordPair={onSubmitWordPair}/>
       <div>
-        <p>{subtitle}</p>
+        <p>{subtitle}: {wordPairList.length}</p>
         <WordPairList
           pairList={wordPairList}
           onDeletePair={onRemovePair}

@@ -1,12 +1,11 @@
 import {useEffect, useState} from "react"
 import {getSettings as getSettingsReq} from "../api"
-import {stringToArray, stringToListPair} from "../util/util";
 
 const useGetSettings = () => {
   const [isLoading, setIsLoading] = useState(true)
 
-  const [data, setData] = useState( {
-    ChannelsToListen: [],
+  const [data, setData] = useState({
+    ChannelsToListen: '',
     IgnoreWords: [],
     Language: '',
     LanguageDetectorEnabled: false,
@@ -17,8 +16,12 @@ const useGetSettings = () => {
   const [error, setError] = useState(undefined)
   useEffect(() => {
     const fetchData = async () => {
-      const data = await getSettingsReq()
-      setData(data)
+      const data = await getSettingsReq();
+      const find = data.UserBanList.find((user) => user === data.ChannelsToListen)
+      if (find === undefined) {
+        data.UserBanList.push(data.ChannelsToListen)
+      }
+      setData(data);
       setIsLoading(false)
     }
     try {

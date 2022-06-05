@@ -7,6 +7,7 @@ const appendToList = (value, list) => {
 const deleteByIndex = (index, list) => {
   const tempList = [...list]
   tempList.splice(index, 1)
+  return tempList
 }
 
 const deleteLastSymbols = (str, count = 1) => {
