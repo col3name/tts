@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react"
-import {getSettings as getSettingsReq} from "../api"
+import {getSettings as getSettingsReq} from "../../api"
 
-const useGetSettings = () => {
+const useGetSetting = () => {
   const [isLoading, setIsLoading] = useState(true)
 
   const [data, setData] = useState({
@@ -38,4 +38,4 @@ const useGetSettings = () => {
   }
 }
 
-export default useGetSettings
+export default useGetSetting

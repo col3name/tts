@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react"
-import useGetSettings from "./useGetSettings"
-import {saveSettings} from "../api"
+import useGetSetting from "./useGetSetting"
+import {saveSettings} from "../../api"
 
 const useSettingState = () => {
   const [channelsToListen, setChannelsToListen] = useState('')
@@ -28,7 +28,7 @@ const useSettingState = () => {
     saveSettings(setting).then()
   };
 
-  const {isLoading, data, error} = useGetSettings()
+  const {isLoading, data, error} = useGetSetting()
 
   useEffect(() => {
     setChannelsToListen(data.ChannelsToListen)

@@ -4,7 +4,7 @@ import Languages from "./Languages"
 import UsernameForm from "./UsernameForm"
 import VolumeInput from "./VolumeInput"
 import WordPair from "./pair/WordPair"
-import useSettingState from "../../hooks/useSettingState"
+import useSettingState from "../../hooks/setting/useSettingState"
 
 const TextToSpeech = () => {
   const {
