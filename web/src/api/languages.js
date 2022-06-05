@@ -248,4 +248,4 @@ const ALL_SUPPORTED_LANGUAGES = [
     "name": "bs"
   }
 ]
-export default ALL_SUPPORTED_LANGUAGES;
+export default ALL_SUPPORTED_LANGUAGES
