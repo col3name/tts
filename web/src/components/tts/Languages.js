@@ -29,7 +29,7 @@ const Languages = ({
 
   return (
     <div>
-      <p>Selected Language {language}</p>
+      <p>Selected Language: {language}</p>
       <label>
         Language Detector Enabled
         <input type="checkbox" value={languageDetectorEnabled}

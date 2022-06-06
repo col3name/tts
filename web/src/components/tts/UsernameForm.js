@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react"
 
 const UsernameForm = ({channelsToListen, onUpdateTwitchUsername}) => {
-  const [localUsername, setLocalUsername] = useState('')
+  const [localUsername, setLocalUsername] = useState(channelsToListen)
 
   const onSubmit = (e) => {
     e.preventDefault()
@@ -18,7 +18,7 @@ const UsernameForm = ({channelsToListen, onUpdateTwitchUsername}) => {
       <input type="text" value={localUsername} onChange={e => setLocalUsername(e.target.value)}/>
     </label>
     <button type="submit">Watch</button>
-    <p>Currently watching {channelsToListen}</p>
+    <p>Currently watching: {channelsToListen}</p>
   </form>
 }
 

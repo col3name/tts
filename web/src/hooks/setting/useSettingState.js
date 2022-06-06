@@ -1,30 +1,29 @@
-import React, {useEffect, useReducer, useState} from "react"
+import {useEffect, useReducer, useRef} from "react"
 import useGetSetting from "./useGetSetting"
-import {saveSettings} from "../../api"
 import {ACTIONS, reducer} from "./reducer";
 import {INITIAL_STATE} from "./default";
+import {saveSettings} from "../../api";
 
 const useSettingState = () => {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE)
 
-  const [isFirst, setIsFirst] = useState(true);
+  const isFirstRef = useRef(true);
   const {isLoading, data, error} = useGetSetting()
 
   useEffect(() => {
-    if (!isLoading) {
-      dispatch({type: ACTIONS.INIT_STATE, payload: data})
+    if (isLoading || error) {
+      return
     }
-  }, [data, error])
+    dispatch({type: ACTIONS.INIT_STATE, payload: data})
+  }, [isLoading, data, error])
 
   useEffect(() => {
-    if (!isFirst && !isLoading) {
-      saveSettings(state).then()
-    } else {
-      setIsFirst(false)
+    if (isFirstRef.current) {
+      isFirstRef.current = false;
+      return;
     }
-  }, [
-    state,
-  ])
+    saveSettings(state)
+  }, [state])
 
   return {
     channelsToListen: {

@@ -17,6 +17,10 @@ const deleteLastSymbols = (str, count = 1) => {
   return str.substring(0, str.length - count)
 }
 
+const isExistInPairList = (pairList, pair) => {
+  return pairList.find(item => item.before.toLowerCase() === pair.before) !== undefined
+}
+
 const stringToArray = (string) => {
   return string.includes(',') ? string.split(',').filter(item => item.length > 0) : []
 }
@@ -51,6 +55,7 @@ const stringToListPair = (string) => {
 
 export {
   appendToList,
+  isExistInPairList,
   deleteByIndex,
   deleteLastSymbols,
   stringToArray,

@@ -20,7 +20,8 @@ const useGetSetting = () => {
     try {
       fetchData()
     } catch (e) {
-      setError(e)
+      setError(e);
+      setIsLoading(false)
     }
   }, [])
 
