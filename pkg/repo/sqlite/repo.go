@@ -12,17 +12,19 @@ type SettingRepoImpl struct {
 }
 
 func NewSettingRepoImpl(db *sql.DB) (*SettingRepoImpl, error) {
-	_, err := db.Exec("CREATE TABLE IF NOT EXISTS settings\n(\n    id   SERIAL NOT NULL PRIMARY KEY,\n    data jsonb\n);")
+	_, err := db.Exec(getCreateSettingTableSQL())
 	if err != nil {
 		return nil, err
 	}
-	return &SettingRepoImpl{
-		db: db,
-	}, nil
+	return &SettingRepoImpl{db: db}, nil
+}
+
+func getCreateSettingTableSQL() string {
+	return "CREATE TABLE IF NOT EXISTS settings\n(\n    id   SERIAL NOT NULL PRIMARY KEY,\n    data jsonb\n);"
 }
 
 func (r *SettingRepoImpl) GetSettings() (*model.SettingDB, error) {
-	row, err := r.db.Query("SELECT data FROM settings WHERE id = 1")
+	row, err := r.db.Query(r.getSettingSQL())
 	if err != nil {
 		return nil, err
 	}
@@ -30,28 +32,54 @@ func (r *SettingRepoImpl) GetSettings() (*model.SettingDB, error) {
 	if row.Err() != nil {
 		return nil, err
 	}
-	var result model.SettingDB
-	var str string
-	if row.Next() {
-		err = row.Scan(&str)
-		if err != nil {
-			return nil, err
-		}
-		err = json.Unmarshal([]byte(str), &result)
-		if err != nil {
-			return nil, err
-		}
-		return &result, nil
+
+	if !row.Next() {
+		return nil, err
 	}
-	return nil, err
+
+	var value string
+
+	err = row.Scan(&value)
+	if err != nil {
+		return nil, err
+	}
+
+	return r.unmarshallSetting(value)
+}
+
+func (r *SettingRepoImpl) getSettingSQL() string {
+	return "SELECT data FROM settings WHERE id = 1;"
 }
 
 func (r *SettingRepoImpl) SaveSettings(settings *model.SettingDB) error {
-	const query = `INSERT OR REPLACE INTO settings (id, data) VALUES (1, $1);`
-	data, err := json.Marshal(*settings)
+	data, err := r.marshalSetting(settings)
 	if err != nil {
 		return err
 	}
-	_, err = r.db.Exec(query, string(data))
+
+	_, err = r.db.Exec(r.getSaveSettingSQL(), data)
 	return err
+}
+
+func (r *SettingRepoImpl) getSaveSettingSQL() string {
+	return `INSERT OR REPLACE INTO settings (id, data) VALUES (1, $1);`
+}
+
+func (r *SettingRepoImpl) unmarshallSetting(value string) (*model.SettingDB, error) {
+	var result model.SettingDB
+
+	err := json.Unmarshal([]byte(value), &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+func (r *SettingRepoImpl) marshalSetting(settings *model.SettingDB) (string, error) {
+	data, err := json.Marshal(*settings)
+	if err != nil {
+		return "", err
+	}
+	return string(data), nil
 }
