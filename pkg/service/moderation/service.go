@@ -7,8 +7,8 @@ import (
 )
 
 type Filter interface {
-	Moderate(text model.Message) string
 	SetFilterMap(filterMap FilterMap)
+	Moderate(text *model.Message) (string, error)
 }
 
 type BaseFilterDecorator struct {
@@ -19,7 +19,7 @@ func (f *BaseFilterDecorator) SetFilterMap(filterMap FilterMap) {
 	f.filter.SetFilterMap(filterMap)
 }
 
-func (f *BaseFilterDecorator) Moderate(text model.Message) string {
+func (f *BaseFilterDecorator) Moderate(text *model.Message) (string, error) {
 	return f.filter.Moderate(text)
 }
 
@@ -41,10 +41,11 @@ var mostPopularTLD = []string{
 	".nl",
 }
 
-func NewDefaultFilter(moderationPair, ignoreString string, users []string) *UserFilterDecorator {
-	filterDefault := NewFilterDefault(moderationPair, ignoreString)
-	urlFilter := NewUrlFilterDecorator(filterDefault)
-	return NewUserFilterDecorator(urlFilter, users)
+func NewDefaultFilter(moderationPair, ignoreString string, users []string) Filter {
+	baseFilter := NewBaseFilter(moderationPair, ignoreString)
+	urlFilter := NewUrlFilterDecorator(baseFilter)
+	userFilter := NewUserFilterDecorator(urlFilter, users)
+	return NewTrimFilterDecorator(userFilter)
 }
 
 type UserFilterDecorator struct {
@@ -52,18 +53,20 @@ type UserFilterDecorator struct {
 	users map[string]struct{}
 }
 
+const MinUsernameLength = 3
+
 func NewUserFilterDecorator(filter Filter, users []string) *UserFilterDecorator {
-	u := map[string]struct{}{}
+	usersMap := map[string]struct{}{}
 	for _, user := range users {
-		if len(user) > 3 {
-			u[user] = struct{}{}
+		if len(user) > MinUsernameLength {
+			usersMap[user] = struct{}{}
 		}
 	}
 	decorator := UserFilterDecorator{
 		BaseFilterDecorator: BaseFilterDecorator{
 			filter: filter,
 		},
-		users: u,
+		users: usersMap,
 	}
 	return &decorator
 }
@@ -72,11 +75,42 @@ func (f *UserFilterDecorator) SetFilterMap(filterMap FilterMap) {
 	f.filter.SetFilterMap(filterMap)
 }
 
-func (f *UserFilterDecorator) Moderate(message model.Message) string {
+func (f *UserFilterDecorator) Moderate(message *model.Message) (string, error) {
 	_, ok := f.users[message.From]
 	if ok {
-		return ""
+		return "", model.ErrorInvalidValue
 	}
+	return f.filter.Moderate(message)
+}
+
+type TrimFilterDecorator struct {
+	BaseFilterDecorator
+}
+
+func NewTrimFilterDecorator(filter Filter) *TrimFilterDecorator {
+	return &TrimFilterDecorator{
+		BaseFilterDecorator{
+			filter: filter,
+		},
+	}
+}
+
+func (f *TrimFilterDecorator) SetFilterMap(filterMap FilterMap) {
+	f.filter.SetFilterMap(filterMap)
+}
+
+func (f *TrimFilterDecorator) Moderate(message *model.Message) (string, error) {
+	text := message.Text
+	text = strings.Trim(text, model.Space)
+	fromLen := len(message.From)
+	if fromLen > len(text) && len(text) == 0 {
+		return "", model.ErrorInvalidValue
+	}
+	check := text[fromLen:]
+	if strings.HasSuffix(check, "say    !") {
+		return "", model.ErrorInvalidValue
+	}
+	message.Text = text
 	return f.filter.Moderate(message)
 }
 
@@ -96,12 +130,13 @@ func (f *UrlFilterDecorator) SetFilterMap(filterMap FilterMap) {
 	f.filter.SetFilterMap(filterMap)
 }
 
-func (f *UrlFilterDecorator) Moderate(message model.Message) string {
-	words := strings.Split(message.Text, model.SeparatorOfSpace)
+func (f *UrlFilterDecorator) Moderate(message *model.Message) (string, error) {
+
+	words := strings.Split(message.Text, model.Space)
 	var text strings.Builder
 	for _, word := range words {
 		if f.isValidWord(word) {
-			text.WriteString(word + model.SeparatorOfSpace)
+			text.WriteString(word + model.Space)
 		}
 	}
 	message.Text = text.String()
@@ -131,14 +166,14 @@ func (f *UrlFilterDecorator) isContainsTopLevelDomain(value string) bool {
 	return false
 }
 
-type FilterDefault struct {
+type BaseFilter struct {
 	filterMap FilterMap
 }
 
 const defaultIgnore = "shit,slut,spunk,whore,fuck,nigger,sex,pussy,queer,sh1t,wank,wtf,anal,bitch,poop,tosser,vagina,balls,Goddamn,muff,clitoris,knobend,knob end,ballsack,bastard,bum,penis,arse,dick,f u c k,God damn,pube,anus,cunt,fellate,feck,felching,lmao,nigga,omg,bollok,dildo,fag,homo,turd,bugger,buttplug,dyke,bollock,flange,blowjob,boob,crap,labia,scrotum,s hit,smegma,ass,biatch,coon,lmfao,boner,fudge packer,jizz,hell,jerk,piss,tit,twat,bloody,butt,damn,blow job,cock,fellatio,fudgepacker,prick"
 
-func NewFilterDefault(moderationPair, ignoreString string) *FilterDefault {
-	f := new(FilterDefault)
+func NewBaseFilter(moderationPair, ignoreString string) *BaseFilter {
+	f := new(BaseFilter)
 	if len(moderationPair) > 0 || len(ignoreString) > 0 {
 		builder := NewFilterMapBuilder()
 		f.filterMap = *builder.Build(moderationPair, ignoreString+defaultIgnore)
@@ -148,12 +183,15 @@ func NewFilterDefault(moderationPair, ignoreString string) *FilterDefault {
 	return f
 }
 
-func (f *FilterDefault) SetFilterMap(filterMap FilterMap) {
+func (f *BaseFilter) SetFilterMap(filterMap FilterMap) {
 	f.filterMap = filterMap
 }
 
-func (f *FilterDefault) Moderate(message model.Message) string {
-	words := strings.Split(message.Text, model.SeparatorOfSpace)
+func (f *BaseFilter) Moderate(message *model.Message) (string, error) {
+	if len(message.Text) == 0 {
+		return message.Text, model.ErrorInvalidValue
+	}
+	words := strings.Split(message.Text, model.Space)
 	var text strings.Builder
 	var value string
 	var ok bool
@@ -165,8 +203,8 @@ func (f *FilterDefault) Moderate(message model.Message) string {
 		} else {
 			text.WriteString(word)
 		}
-		text.WriteString(model.SeparatorOfSpace)
+		text.WriteString(model.Space)
 	}
 
-	return text.String()
+	return text.String(), nil
 }

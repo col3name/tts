@@ -8,7 +8,6 @@ import (
 	lang_detection "github.com/col3name/tts/pkg/service/lang-detection"
 	"github.com/col3name/tts/pkg/service/moderation"
 	"github.com/col3name/tts/pkg/util"
-	"strings"
 )
 
 type SpeechVoiceDTO struct {
@@ -16,18 +15,17 @@ type SpeechVoiceDTO struct {
 	Text string
 }
 type SpeechVoiceService interface {
-	Speak(text model.Message) error
+	Speak(text *model.Message) error
 }
 
 type GoTtsService struct {
-	speech              gotts.Speech
-	language            string
-	filter              moderation.Filter
-	volume              float64
-	from                string
-	repo                repo.SettingRepo
-	langDetector        lang_detection.LanguageDetectionService
-	langDetectorEnabled bool
+	speech                  gotts.Speech
+	language                string
+	filter                  moderation.Filter
+	volume                  float64
+	repo                    repo.SettingRepo
+	langDetector            lang_detection.LanguageDetectionService
+	languageDetectorEnabled bool
 }
 
 func NewSpeech(language string, volume float64) gotts.Speech {
@@ -49,69 +47,99 @@ func NewGoTtsService(language string, filter moderation.Filter, volume float64, 
 	s.filter = filter
 	s.repo = repo
 	s.langDetector = langDetector
-	s.langDetectorEnabled = langDetectorEnabled
+	s.languageDetectorEnabled = langDetectorEnabled
 	return s
 }
 
-func (s *GoTtsService) Speak(text string) error {
-	if s.repo != nil {
-		settingDb, err := s.repo.GetSettings()
-		if err != nil {
-			return err
-		}
-		s.filter = moderation.NewDefaultFilter(settingDb.ReplacementWordPair,
-			settingDb.IgnoreWords,
-			util.StringOfEnumerationToArray(settingDb.UserBanList))
-		if s.volume != settingDb.Volume {
-			s.speech = NewSpeech(s.language, s.volume)
-		}
-		s.volume = settingDb.Volume
-		s.langDetectorEnabled = settingDb.LanguageDetectorEnabled
-		if err = s.repo.SaveSettings(settingDb); err != nil {
-			return err
-		}
-		s.setLanguage(settingDb.Language)
+func (s *GoTtsService) Speak(message *model.Message) error {
+	err := s.updateSettings(message.Text)
+	if err != nil {
+		return err
 	}
-
-	if s.langDetectorEnabled {
-		if err := s.detectLanguage(text); err != nil {
-			return err
-		}
+	text, err := s.moderateMessageFromUser(message)
+	if err != nil {
+		return err
 	}
-
-	result := s.filter.Moderate(model.Message{From: s.from, Text: text})
-	result = strings.Trim(result, " ")
-	fromLen := len(s.from)
-	if fromLen > len(result) && len(result) == 0 {
-		return nil
-	}
-	check := result[fromLen:]
-	if strings.HasSuffix(check, "say    !") {
-		return nil
-	}
-	return s.speech.Speak(result)
+	return s.speak(text)
 }
 
-func (s *GoTtsService) setLanguage(language string) {
-	s.speech = NewSpeech(language, s.volume)
-	s.language = language
+func (s *GoTtsService) updateSettings(text string) error {
+	if s.repo == nil {
+		return nil
+	}
+	settingsFromDB, err := s.getSettingsFromDB()
+	if err != nil {
+		return err
+	}
+
+	s.updateFilter(settingsFromDB)
+	s.updateVolume(settingsFromDB)
+	s.updateLanguageDectector(settingsFromDB)
+
+	if err = s.updateSettingsInDB(settingsFromDB); err != nil {
+		return err
+	}
+	s.updateLanguage(settingsFromDB.Language)
+
+	return s.updateDetectedLanguage(text)
 }
 
-func (s *GoTtsService) detectLanguage(text string) error {
+func (s *GoTtsService) updateLanguageDectector(settingsFromDB *model.SettingDB) {
+	s.languageDetectorEnabled = settingsFromDB.LanguageDetectorEnabled
+}
+func (s *GoTtsService) moderateMessageFromUser(message *model.Message) (string, error) {
+	return s.filter.Moderate(message)
+}
+
+func (s *GoTtsService) speak(text string) error {
+	return s.speech.Speak(text)
+}
+
+func (s *GoTtsService) getSettingsFromDB() (*model.SettingDB, error) {
+	return s.repo.GetSettings()
+}
+
+func (s *GoTtsService) updateSettingsInDB(settingsFromDB *model.SettingDB) error {
+	return s.repo.SaveSettings(settingsFromDB)
+}
+
+func (s *GoTtsService) updateVolume(settingDb *model.SettingDB) {
+	if s.volume != settingDb.Volume {
+		s.speech = NewSpeech(s.language, s.volume)
+	}
+	s.volume = settingDb.Volume
+}
+
+func (s *GoTtsService) updateFilter(settingDb *model.SettingDB) {
+	users := util.StringOfEnumerationToArray(settingDb.UserBanList)
+	s.filter = moderation.NewDefaultFilter(settingDb.ReplacementWordPair, settingDb.IgnoreWords, users)
+}
+
+func (s *GoTtsService) updateDetectedLanguage(text string) error {
+	if !s.languageDetectorEnabled {
+		return nil
+	}
 	langDetected, err := s.langDetector.Detect(text)
 	if err != nil {
 		return err
 	}
-	lang := string(*langDetected)
-	s.setLanguage(lang)
-	if s.repo != nil {
-		settingDb, err := s.repo.GetSettings()
-		if err != nil {
-			return err
-		}
-		s.langDetectorEnabled = settingDb.LanguageDetectorEnabled
-		settingDb.Language = lang
-		return s.repo.SaveSettings(settingDb)
+	language := string(*langDetected)
+	s.updateLanguage(language)
+
+	if s.repo == nil {
+		return nil
 	}
-	return nil
+
+	settingDb, err := s.getSettingsFromDB()
+	if err != nil {
+		return err
+	}
+	s.updateLanguageDectector(settingDb)
+	settingDb.Language = language
+	return s.updateSettingsInDB(settingDb)
+}
+
+func (s *GoTtsService) updateLanguage(language string) {
+	s.speech = NewSpeech(language, s.volume)
+	s.language = language
 }

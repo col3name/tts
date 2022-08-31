@@ -1,15 +1,20 @@
 package model
 
 import (
+	"errors"
 	"github.com/col3name/tts/pkg/service/moderation"
 	"github.com/col3name/tts/pkg/util"
 	"strings"
 )
 
-const SeparatorOfSpace = " "
+const Space = " "
 const SeparatorOfItem = ","
 const SeparatorOfPair = ","
 const EmptyCharacter = ""
+
+var (
+	ErrorInvalidValue = errors.New("InvalidValue")
+)
 
 type Message struct {
 	From string

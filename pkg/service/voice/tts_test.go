@@ -1,6 +1,7 @@
 package voice
 
 import (
+	"github.com/col3name/tts/pkg/model"
 	langdetection "github.com/col3name/tts/pkg/service/lang-detection"
 	"github.com/col3name/tts/pkg/service/moderation"
 	"github.com/stretchr/testify/assert"
@@ -10,7 +11,7 @@ import (
 func TestName(t *testing.T) {
 	detectionService := langdetection.NewLinguaDetectionService(langdetection.DefaultLanguages)
 
-	service := NewGoTtsService("", moderation.NewFilterDefault("", ""), 1, nil, true, detectionService)
+	service := NewGoTtsService("", moderation.NewBaseFilter("", ""), 1, nil, true, detectionService)
 	tests := []struct {
 		input    string
 		language string
@@ -23,6 +24,9 @@ func TestName(t *testing.T) {
 		{"Каждому языку присваивается двухбуквенный символ!", "русский"},
 	}
 	for _, test := range tests {
-		assert.NoError(t, service.Speak(test.input))
+		assert.NoError(t, service.Speak(model.Message{
+			From: "",
+			Text: test.input,
+		}))
 	}
 }

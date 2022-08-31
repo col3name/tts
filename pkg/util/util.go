@@ -1,9 +1,12 @@
 package util
 
-import "strings"
+import (
+	"github.com/col3name/tts/pkg/model"
+	"strings"
+)
 
 func StringOfEnumerationToArray(str string) []string {
-	return strings.Split(str, ",")
+	return strings.Split(str, model.SeparatorOfPair)
 }
 
 func FindInArray(arr []string, val string) int {
