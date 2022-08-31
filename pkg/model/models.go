@@ -115,6 +115,6 @@ func (s *Setting) GetReplacementPair(key string) (string, bool) {
 }
 
 func (s *Setting) SetReplacementWordPair(str string) {
-	builder := moderation.FilterMapBuilderImpl{}
+	builder := moderation.NewFilterMapBuilder()
 	s.ReplacementWordPair = *builder.Build(str, "")
 }

@@ -1,6 +1,7 @@
 package moderation
 
 import (
+	"errors"
 	"github.com/col3name/tts/pkg/util"
 	"strings"
 )
@@ -23,6 +24,7 @@ func (m *FilterMap) Get(from string) (string, bool) {
 func (m *FilterMap) Range() map[string]string {
 	return m.data
 }
+
 func (m *FilterMap) String() string {
 	var result string
 	for key, value := range m.data {
@@ -117,31 +119,60 @@ var bannedWord = map[string]string{"anal": "",
 	"whore":        "",
 	"wtf":          ""}
 
+var (
+	ErrorInvalidValue = errors.New("InvalidValue")
+)
+
+var DefaultFilterMap = FilterMap{
+	data: bannedWord,
+}
+
 type FilterMapBuilder interface {
 	build(value string) FilterMap
 }
 
 type FilterMapBuilderImpl struct{}
 
-func (b *FilterMapBuilderImpl) Build(value string, ignoreString string) *FilterMap {
-	pairs := util.StringOfEnumerationToArray(value)
-	result := NewFilterMap()
-	for _, pair := range pairs {
-		splitPair := strings.Split(pair, ":")
-		if len(splitPair) != 2 {
-			return nil
-		}
-		result.Set(strings.ToLower(splitPair[0]), strings.ToLower(splitPair[1]))
-	}
-
-	split := util.StringOfEnumerationToArray(ignoreString)
-	for _, ignore := range split {
-		result.Set(strings.ToLower(ignore), "")
-	}
-
-	return result
+func NewFilterMapBuilder() *FilterMapBuilderImpl {
+	return &FilterMapBuilderImpl{}
 }
 
-var DefaultFilterMap = FilterMap{
-	data: bannedWord,
+func (b *FilterMapBuilderImpl) Build(wordPairs string, ignoreString string) *FilterMap {
+	filterMap := NewFilterMap()
+	err := b.fillFilterMap(filterMap, wordPairs, b.handleWordPair)
+	if err != nil {
+		return nil
+	}
+	err = b.fillFilterMap(filterMap, ignoreString, b.handleIgnoreWord)
+	if err != nil {
+		return nil
+	}
+	return filterMap
+}
+
+func (b *FilterMapBuilderImpl) fillFilterMap(filterMap *FilterMap, value string, fn func(filterMap *FilterMap, pair string) error) error {
+	itemArray := util.StringOfEnumerationToArray(value)
+
+	for _, item := range itemArray {
+		err := fn(filterMap, item)
+		if err != nil {
+			return ErrorInvalidValue
+		}
+	}
+
+	return nil
+}
+
+func (b *FilterMapBuilderImpl) handleWordPair(filterMap *FilterMap, pair string) error {
+	splitPair := strings.Split(pair, ":")
+	if len(splitPair) != 2 {
+		return ErrorInvalidValue
+	}
+	filterMap.Set(strings.ToLower(splitPair[0]), strings.ToLower(splitPair[1]))
+	return nil
+}
+
+func (b *FilterMapBuilderImpl) handleIgnoreWord(filterMap *FilterMap, word string) error {
+	filterMap.Set(strings.ToLower(word), "")
+	return nil
 }

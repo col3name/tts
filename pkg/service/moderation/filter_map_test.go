@@ -7,7 +7,7 @@ import (
 )
 
 func TestDefaultMapFilterBuilder(t *testing.T) {
-	builder := FilterMapBuilderImpl{}
+	builder := NewFilterMapBuilder()
 	result := builder.Build(`bad:nice,sad:happy`, "")
 	get, ok := result.Get("bad")
 	assert.True(t, ok)

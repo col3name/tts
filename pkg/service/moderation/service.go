@@ -136,7 +136,7 @@ const defaultIgnore = "shit,slut,spunk,whore,fuck,nigger,sex,pussy,queer,sh1t,wa
 func NewFilterDefault(moderationPair, ignoreString string) *FilterDefault {
 	f := new(FilterDefault)
 	if len(moderationPair) > 0 || len(ignoreString) > 0 {
-		builder := FilterMapBuilderImpl{}
+		builder := NewFilterMapBuilder()
 		f.filterMap = *builder.Build(moderationPair, ignoreString+defaultIgnore)
 	} else {
 		f.filterMap = DefaultFilterMap
@@ -151,13 +151,13 @@ func (f *FilterDefault) SetFilterMap(filterMap FilterMap) {
 func (f *FilterDefault) Moderate(msg model.Message) string {
 	words := strings.Split(msg.Text, " ")
 	var result string
-	var val string
+	var value string
 	var ok bool
 
 	for _, word := range words {
-		val, ok = f.filterMap.Get(strings.ToLower(word))
+		value, ok = f.filterMap.Get(strings.ToLower(word))
 		if ok {
-			result += val
+			result += value
 		} else {
 			result += word
 		}
