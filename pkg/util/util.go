@@ -2,7 +2,7 @@ package util
 
 import "strings"
 
-func StrEnumerationToArray(str string) []string {
+func StringOfEnumerationToArray(str string) []string {
 	return strings.Split(str, ",")
 }
 

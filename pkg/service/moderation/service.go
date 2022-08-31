@@ -1,17 +1,13 @@
 package moderation
 
 import (
+	"github.com/col3name/tts/pkg/model"
 	"net/url"
 	"strings"
 )
 
-type Message struct {
-	From string
-	Text string
-}
-
 type Filter interface {
-	Moderate(text Message) string
+	Moderate(text model.Message) string
 	SetFilterMap(filterMap FilterMap)
 }
 
@@ -23,7 +19,7 @@ func (f *BaseFilterDecorator) SetFilterMap(filterMap FilterMap) {
 	f.filter.SetFilterMap(filterMap)
 }
 
-func (f *BaseFilterDecorator) Moderate(text Message) string {
+func (f *BaseFilterDecorator) Moderate(text model.Message) string {
 	return f.filter.Moderate(text)
 }
 
@@ -76,7 +72,7 @@ func (f *UserFilterDecorator) SetFilterMap(filterMap FilterMap) {
 	f.filter.SetFilterMap(filterMap)
 }
 
-func (f *UserFilterDecorator) Moderate(msg Message) string {
+func (f *UserFilterDecorator) Moderate(msg model.Message) string {
 	_, ok := f.users[msg.From]
 	if ok {
 		return ""
@@ -100,7 +96,7 @@ func (f *UrlFilterDecorator) SetFilterMap(filterMap FilterMap) {
 	f.filter.SetFilterMap(filterMap)
 }
 
-func (f *UrlFilterDecorator) Moderate(msg Message) string {
+func (f *UrlFilterDecorator) Moderate(msg model.Message) string {
 	split := strings.Split(msg.Text, " ")
 	var result string
 	for _, word := range split {
@@ -152,7 +148,7 @@ func (f *FilterDefault) SetFilterMap(filterMap FilterMap) {
 	f.filterMap = filterMap
 }
 
-func (f *FilterDefault) Moderate(msg Message) string {
+func (f *FilterDefault) Moderate(msg model.Message) string {
 	words := strings.Split(msg.Text, " ")
 	var result string
 	var val string

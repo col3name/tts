@@ -3,6 +3,7 @@ package voice
 import (
 	"github.com/col3name/gotts"
 	"github.com/col3name/gotts/voices"
+	"github.com/col3name/tts/pkg/model"
 	"github.com/col3name/tts/pkg/repo"
 	lang_detection "github.com/col3name/tts/pkg/service/lang-detection"
 	"github.com/col3name/tts/pkg/service/moderation"
@@ -10,13 +11,12 @@ import (
 	"strings"
 )
 
-type SetterFromService interface {
-	SetFrom(from string)
+type SpeechVoiceDTO struct {
+	From string
+	Text string
 }
-
 type SpeechVoiceService interface {
-	SetterFromService
-	Speak(text string) error
+	Speak(text model.Message) error
 }
 
 type GoTtsService struct {
@@ -28,6 +28,10 @@ type GoTtsService struct {
 	repo                repo.SettingRepo
 	langDetector        lang_detection.LanguageDetectionService
 	langDetectorEnabled bool
+}
+
+func NewSpeech(language string, volume float64) gotts.Speech {
+	return gotts.Speech{Folder: "audio", Language: language, Volume: volume, Speed: 1}
 }
 
 func NewGoTtsService(language string, filter moderation.Filter, volume float64, repo repo.SettingRepo, langDetectorEnabled bool, langDetector lang_detection.LanguageDetectionService) *GoTtsService {
@@ -49,8 +53,43 @@ func NewGoTtsService(language string, filter moderation.Filter, volume float64, 
 	return s
 }
 
-func (s *GoTtsService) SetFrom(from string) {
-	s.from = from
+func (s *GoTtsService) Speak(text string) error {
+	if s.repo != nil {
+		settingDb, err := s.repo.GetSettings()
+		if err != nil {
+			return err
+		}
+		s.filter = moderation.NewDefaultFilter(settingDb.ReplacementWordPair,
+			settingDb.IgnoreWords,
+			util.StringOfEnumerationToArray(settingDb.UserBanList))
+		if s.volume != settingDb.Volume {
+			s.speech = NewSpeech(s.language, s.volume)
+		}
+		s.volume = settingDb.Volume
+		s.langDetectorEnabled = settingDb.LanguageDetectorEnabled
+		if err = s.repo.SaveSettings(settingDb); err != nil {
+			return err
+		}
+		s.setLanguage(settingDb.Language)
+	}
+
+	if s.langDetectorEnabled {
+		if err := s.detectLanguage(text); err != nil {
+			return err
+		}
+	}
+
+	result := s.filter.Moderate(model.Message{From: s.from, Text: text})
+	result = strings.Trim(result, " ")
+	fromLen := len(s.from)
+	if fromLen > len(result) && len(result) == 0 {
+		return nil
+	}
+	check := result[fromLen:]
+	if strings.HasSuffix(check, "say    !") {
+		return nil
+	}
+	return s.speech.Speak(result)
 }
 
 func (s *GoTtsService) setLanguage(language string) {
@@ -75,45 +114,4 @@ func (s *GoTtsService) detectLanguage(text string) error {
 		return s.repo.SaveSettings(settingDb)
 	}
 	return nil
-}
-
-func (s *GoTtsService) Speak(text string) error {
-	if s.repo != nil {
-		settingDb, err := s.repo.GetSettings()
-		if err != nil {
-			return err
-		}
-		s.filter = moderation.NewDefaultFilter(settingDb.ReplacementWordPair, settingDb.IgnoreWords, util.StrEnumerationToArray(settingDb.UserBanList))
-		if s.volume != settingDb.Volume {
-			s.speech = NewSpeech(s.language, s.volume)
-		}
-		s.volume = settingDb.Volume
-		s.langDetectorEnabled = settingDb.LanguageDetectorEnabled
-		if err = s.repo.SaveSettings(settingDb); err != nil {
-			return err
-		}
-		s.setLanguage(settingDb.Language)
-	}
-
-	if s.langDetectorEnabled {
-		if err := s.detectLanguage(text); err != nil {
-			return err
-		}
-	}
-
-	result := s.filter.Moderate(moderation.Message{From: s.from, Text: text})
-	result = strings.Trim(result, " ")
-	fromLen := len(s.from)
-	if fromLen > len(result) && len(result) == 0 {
-		return nil
-	}
-	check := result[fromLen:]
-	if strings.HasSuffix(check, "say    !") {
-		return nil
-	}
-	return s.speech.Speak(result)
-}
-
-func NewSpeech(language string, volume float64) gotts.Speech {
-	return gotts.Speech{Folder: "audio", Language: language, Volume: volume, Speed: 1}
 }

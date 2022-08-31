@@ -124,7 +124,7 @@ type FilterMapBuilder interface {
 type FilterMapBuilderImpl struct{}
 
 func (b *FilterMapBuilderImpl) Build(value string, ignoreString string) *FilterMap {
-	pairs := util.StrEnumerationToArray(value)
+	pairs := util.StringOfEnumerationToArray(value)
 	result := NewFilterMap()
 	for _, pair := range pairs {
 		splitPair := strings.Split(pair, ":")
@@ -134,7 +134,7 @@ func (b *FilterMapBuilderImpl) Build(value string, ignoreString string) *FilterM
 		result.Set(strings.ToLower(splitPair[0]), strings.ToLower(splitPair[1]))
 	}
 
-	split := util.StrEnumerationToArray(ignoreString)
+	split := util.StringOfEnumerationToArray(ignoreString)
 	for _, ignore := range split {
 		result.Set(strings.ToLower(ignore), "")
 	}

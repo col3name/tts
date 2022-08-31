@@ -6,6 +6,11 @@ import (
 	"strings"
 )
 
+type Message struct {
+	From string
+	Text string
+}
+
 type SettingDB struct {
 	Id                      int
 	ReplacementWordPair     string
