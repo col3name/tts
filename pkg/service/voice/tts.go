@@ -30,11 +30,7 @@ type GoTtsService struct {
 	languageDetectorEnabled bool
 }
 
-const AudioFolder = "audio"
-
-func NewSpeech(language string, volume float64) gotts.Speech {
-	return gotts.Speech{Folder: AudioFolder, Language: language, Volume: volume, Speed: 1}
-}
+const AudioFolder = gotts.AudioFolder
 
 func NewGoTtsService(language string, filter moderation.Filter, volume float64, repo repo.SettingRepo, langDetectorEnabled bool, langDetector lang_detection.LanguageDetectionService) *GoTtsService {
 	if !number.InRange(volume, 0, 15) {
@@ -46,7 +42,7 @@ func NewGoTtsService(language string, filter moderation.Filter, volume float64, 
 
 	s := new(GoTtsService)
 	s.volume = volume
-	s.speech = NewSpeech(language, volume)
+	s.speech = *gotts.NewSpeech(language, volume)
 	s.language = language
 	s.filter = filter
 	s.repo = repo
@@ -109,7 +105,7 @@ func (s *GoTtsService) updateSettingsInDB(settingsFromDB *model.SettingDB) error
 
 func (s *GoTtsService) updateVolume(settingDb *model.SettingDB) {
 	if s.volume != settingDb.Volume {
-		s.speech = NewSpeech(s.language, s.volume)
+		s.speech = *gotts.NewSpeech(s.language, s.volume)
 	}
 	s.volume = settingDb.Volume
 }
@@ -144,6 +140,6 @@ func (s *GoTtsService) updateDetectedLanguage(text string) error {
 }
 
 func (s *GoTtsService) updateLanguage(language string) {
-	s.speech = NewSpeech(language, s.volume)
+	s.speech = *gotts.NewSpeech(language, s.volume)
 	s.language = language
 }
