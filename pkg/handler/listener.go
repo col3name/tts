@@ -30,22 +30,22 @@ func (l *ChatListener) Handle() {
 	l.isFirst = true
 	for range l.chCompleted {
 		l.mx.RLock()
-		msg := <-l.ch
-		fmt.Println("start", time.Now(), msg)
-		err := l.speakService.Speak(msg)
+		message := <-l.ch
+		fmt.Println("start", time.Now(), message)
+		err := l.speakService.Speak(message)
 		if err != nil {
 			fmt.Println(err)
 		}
-		fmt.Println("complete", time.Now(), msg)
+		fmt.Println("complete", time.Now(), message)
 		l.chCompleted <- true
 		l.mx.RUnlock()
 	}
 }
 
-func (l *ChatListener) OnShardMessage(_ int, msg irc.ChatMessage) {
-	s := msg.Sender.DisplayName + " say that " + msg.Text + " !"
+func (l *ChatListener) OnShardMessage(_ int, message irc.ChatMessage) {
+	s := message.Sender.DisplayName + " say that " + message.Text + " !"
 	fmt.Println("send", s)
-	l.ch <- model.Message{From: msg.Sender.Username, Text: s}
+	l.ch <- model.Message{From: message.Sender.Username, Text: s}
 	if l.isFirst {
 		l.chCompleted <- true
 		l.isFirst = false

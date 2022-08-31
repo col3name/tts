@@ -72,12 +72,12 @@ func (f *UserFilterDecorator) SetFilterMap(filterMap FilterMap) {
 	f.filter.SetFilterMap(filterMap)
 }
 
-func (f *UserFilterDecorator) Moderate(msg model.Message) string {
-	_, ok := f.users[msg.From]
+func (f *UserFilterDecorator) Moderate(message model.Message) string {
+	_, ok := f.users[message.From]
 	if ok {
 		return ""
 	}
-	return f.filter.Moderate(msg)
+	return f.filter.Moderate(message)
 }
 
 type UrlFilterDecorator struct {
@@ -96,31 +96,35 @@ func (f *UrlFilterDecorator) SetFilterMap(filterMap FilterMap) {
 	f.filter.SetFilterMap(filterMap)
 }
 
-func (f *UrlFilterDecorator) Moderate(msg model.Message) string {
-	split := strings.Split(msg.Text, " ")
-	var result string
-	for _, word := range split {
-		if !f.isValidUrl(word) && !f.isContainsTopLevelDomain(word) {
-			result += word + " "
+func (f *UrlFilterDecorator) Moderate(message model.Message) string {
+	words := strings.Split(message.Text, model.SeparatorOfSpace)
+	var text strings.Builder
+	for _, word := range words {
+		if f.isValidWord(word) {
+			text.WriteString(word + model.SeparatorOfSpace)
 		}
 	}
-	msg.Text = result
-	return f.filter.Moderate(msg)
+	message.Text = text.String()
+	return f.filter.Moderate(message)
 }
 
-func (f *UrlFilterDecorator) isValidUrl(str string) bool {
-	_, err := url.ParseRequestURI(str)
+func (f *UrlFilterDecorator) isValidWord(value string) bool {
+	return !f.isValidUrl(value) && !f.isContainsTopLevelDomain(value)
+}
+
+func (f *UrlFilterDecorator) isValidUrl(value string) bool {
+	_, err := url.ParseRequestURI(value)
 	if err != nil {
 		return false
 	}
 
-	u, err := url.Parse(str)
+	u, err := url.Parse(value)
 	return err == nil && u.Scheme != "" && u.Host != ""
 }
 
-func (f *UrlFilterDecorator) isContainsTopLevelDomain(str string) bool {
+func (f *UrlFilterDecorator) isContainsTopLevelDomain(value string) bool {
 	for _, item := range mostPopularTLD {
-		if strings.Contains(str, item) {
+		if strings.Contains(value, item) {
 			return true
 		}
 	}
@@ -148,21 +152,21 @@ func (f *FilterDefault) SetFilterMap(filterMap FilterMap) {
 	f.filterMap = filterMap
 }
 
-func (f *FilterDefault) Moderate(msg model.Message) string {
-	words := strings.Split(msg.Text, " ")
-	var result string
+func (f *FilterDefault) Moderate(message model.Message) string {
+	words := strings.Split(message.Text, model.SeparatorOfSpace)
+	var text strings.Builder
 	var value string
 	var ok bool
 
 	for _, word := range words {
 		value, ok = f.filterMap.Get(strings.ToLower(word))
 		if ok {
-			result += value
+			text.WriteString(value)
 		} else {
-			result += word
+			text.WriteString(word)
 		}
-		result += " "
+		text.WriteString(model.SeparatorOfSpace)
 	}
 
-	return result
+	return text.String()
 }

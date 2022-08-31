@@ -6,6 +6,11 @@ import (
 	"strings"
 )
 
+const SeparatorOfSpace = " "
+const SeparatorOfItem = ","
+const SeparatorOfPair = ","
+const EmptyCharacter = ""
+
 type Message struct {
 	From string
 	Text string
@@ -24,17 +29,21 @@ type SettingDB struct {
 
 func (s *SettingDB) SetReplacementWordPair(filter moderation.FilterMap) {
 	filterMap := filter.Range()
-	result := ""
+	var textBuilder strings.Builder
 	for key, value := range filterMap {
-		result += key + ":" + value + ","
+		textBuilder.WriteString(key)
+		textBuilder.WriteString(SeparatorOfPair)
+		textBuilder.WriteString(value)
+		textBuilder.WriteString(SeparatorOfItem)
 	}
-	s.ReplacementWordPair = result[:len(result)-1]
+	text := textBuilder.String()
+	s.ReplacementWordPair = text[:len(text)-1]
 }
 
 func (s *SettingDB) SetIgnoreWords(words []string) {
 	var result string
 	for _, item := range words {
-		result += item + ","
+		result += item + SeparatorOfItem
 	}
 	s.IgnoreWords = result[:len(result)-1]
 }
@@ -42,7 +51,7 @@ func (s *SettingDB) SetIgnoreWords(words []string) {
 func (s *SettingDB) SetUserBanList(users []string) {
 	var result string
 	for _, item := range users {
-		result += item + ","
+		result += item + SeparatorOfItem
 	}
 	s.UserBanList = result[:len(result)-1]
 }
@@ -50,7 +59,7 @@ func (s *SettingDB) SetUserBanList(users []string) {
 func (s *SettingDB) SetChannelsToListen(list []string) {
 	var result string
 	for _, item := range list {
-		result += item + ","
+		result += item + SeparatorOfItem
 	}
 	s.ChannelsToListen = result[:len(result)-1]
 }
@@ -67,7 +76,7 @@ type Setting struct {
 }
 
 func (s *Setting) SetIgnoreWords(str string) {
-	s.IgnoreWords = strings.Split(str, ",")
+	s.IgnoreWords = strings.Split(str, SeparatorOfItem)
 }
 
 func (s *Setting) StoreIgnoreWord(word string) {
@@ -79,7 +88,7 @@ func (s *Setting) DeleteIgnoreWord(word string) {
 }
 
 func (s *Setting) SetUserBanList(str string) {
-	s.UserBanList = strings.Split(str, ",")
+	s.UserBanList = strings.Split(str, SeparatorOfItem)
 }
 
 func (s *Setting) StoreUserBanList(user string) {
@@ -91,7 +100,7 @@ func (s *Setting) DeleteUserBanList(user string) {
 }
 
 func (s *Setting) SetChannelsToListen(str string) {
-	s.ChannelsToListen = strings.Split(str, ",")
+	s.ChannelsToListen = strings.Split(str, SeparatorOfItem)
 }
 
 func (s *Setting) StoreChannelsToListen(user string) {
@@ -116,5 +125,5 @@ func (s *Setting) GetReplacementPair(key string) (string, bool) {
 
 func (s *Setting) SetReplacementWordPair(str string) {
 	builder := moderation.NewFilterMapBuilder()
-	s.ReplacementWordPair = *builder.Build(str, "")
+	s.ReplacementWordPair = *builder.Build(str, EmptyCharacter)
 }
