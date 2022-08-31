@@ -1,6 +1,6 @@
 package separator
 
 const Space = " "
-const SeparatorOfItem = ","
-const SeparatorOfPair = ","
+const Item = ","
+const Pair = ":"
 const EmptyCharacter = ""

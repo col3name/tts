@@ -23,19 +23,19 @@ type LanguageDetectionService interface {
 	Detect(text string) (*Language, error)
 }
 
-type LinguaDetectionService struct {
+type LanguageDetectionServiceImpl struct {
 	detector lingua.LanguageDetector
 }
 
-func NewLinguaDetectionService(languages []lingua.Language) *LinguaDetectionService {
-	return &LinguaDetectionService{
+func NewLinguaDetectionService(languages []lingua.Language) *LanguageDetectionServiceImpl {
+	return &LanguageDetectionServiceImpl{
 		detector: lingua.NewLanguageDetectorBuilder().
 			FromLanguages(languages...).
 			Build(),
 	}
 }
 
-func (s *LinguaDetectionService) Detect(text string) (*Language, error) {
+func (s *LanguageDetectionServiceImpl) Detect(text string) (*Language, error) {
 	lang, ok := s.detector.DetectLanguageOf(text)
 	if !ok {
 		return nil, ErrUnsupportedLanguage

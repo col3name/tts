@@ -32,9 +32,9 @@ func (s *SettingDB) SetReplacementWordPair(filter container.Map) {
 	var textBuilder strings.Builder
 	for key, value := range filterMap {
 		textBuilder.WriteString(key)
-		textBuilder.WriteString(separator.SeparatorOfPair)
+		textBuilder.WriteString(separator.Pair)
 		textBuilder.WriteString(value)
-		textBuilder.WriteString(separator.SeparatorOfItem)
+		textBuilder.WriteString(separator.Item)
 	}
 	text := textBuilder.String()
 	s.ReplacementWordPair = text[:len(text)-1]
@@ -43,7 +43,7 @@ func (s *SettingDB) SetReplacementWordPair(filter container.Map) {
 func (s *SettingDB) SetIgnoreWords(words []string) {
 	var result string
 	for _, item := range words {
-		result += item + separator.SeparatorOfItem
+		result += item + separator.Item
 	}
 	s.IgnoreWords = result[:len(result)-1]
 }
@@ -51,7 +51,7 @@ func (s *SettingDB) SetIgnoreWords(words []string) {
 func (s *SettingDB) SetUserBanList(users []string) {
 	var result string
 	for _, item := range users {
-		result += item + separator.SeparatorOfItem
+		result += item + separator.Item
 	}
 	s.UserBanList = result[:len(result)-1]
 }
@@ -59,7 +59,7 @@ func (s *SettingDB) SetUserBanList(users []string) {
 func (s *SettingDB) SetChannelsToListen(list []string) {
 	var result string
 	for _, item := range list {
-		result += item + separator.SeparatorOfItem
+		result += item + separator.Item
 	}
 	s.ChannelsToListen = result[:len(result)-1]
 }

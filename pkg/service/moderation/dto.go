@@ -19,7 +19,7 @@ type Setting struct {
 }
 
 func (s *Setting) SetIgnoreWords(value string) {
-	s.IgnoreWords = strings.Split(value, separator.SeparatorOfItem)
+	s.IgnoreWords = strings.Split(value, separator.Item)
 }
 
 func (s *Setting) StoreIgnoreWord(word string) {
@@ -31,7 +31,7 @@ func (s *Setting) DeleteIgnoreWord(word string) {
 }
 
 func (s *Setting) SetUserBanList(value string) {
-	s.UserBanList = strings.Split(value, separator.SeparatorOfItem)
+	s.UserBanList = strings.Split(value, separator.Item)
 }
 
 func (s *Setting) StoreUserBanList(user string) {
@@ -43,7 +43,7 @@ func (s *Setting) DeleteUserBanList(user string) {
 }
 
 func (s *Setting) SetChannelsToListen(value string) {
-	s.ChannelsToListen = strings.Split(value, separator.SeparatorOfItem)
+	s.ChannelsToListen = strings.Split(value, separator.Item)
 }
 
 func (s *Setting) StoreChannelsToListen(user string) {

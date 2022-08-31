@@ -21,7 +21,6 @@ func (s *Server) StartServer(serverUrl string, handler http.Handler) *http.Serve
 func (s *Server) GetKillSignalChan() chan os.Signal {
 	osKillSignalChan := make(chan os.Signal, 1)
 	signal.Notify(osKillSignalChan, os.Interrupt, syscall.SIGTERM)
-
 	return osKillSignalChan
 }
 

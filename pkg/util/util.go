@@ -6,7 +6,7 @@ import (
 )
 
 func StringOfEnumerationToArray(str string) []string {
-	return strings.Split(str, separator.SeparatorOfPair)
+	return strings.Split(str, separator.Pair)
 }
 
 func FindInArray(arr []string, val string) int {

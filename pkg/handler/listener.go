@@ -9,7 +9,12 @@ import (
 	"time"
 )
 
-type ChatListener struct {
+type ChatListener interface {
+	Handle()
+	OnShardMessage(_ int, message irc.ChatMessage)
+}
+
+type TwitchChatListener struct {
 	speakService    voice.SpeechVoiceService
 	messagesChannel chan model.Message
 	chCompleted     chan bool
@@ -17,8 +22,8 @@ type ChatListener struct {
 	mx              sync.RWMutex
 }
 
-func NewChatListener(service voice.SpeechVoiceService) *ChatListener {
-	c := new(ChatListener)
+func NewChatListener(service voice.SpeechVoiceService) *TwitchChatListener {
+	c := new(TwitchChatListener)
 	c.speakService = service
 	c.messagesChannel = make(chan model.Message, 100)
 	c.chCompleted = make(chan bool, 1)
@@ -26,7 +31,7 @@ func NewChatListener(service voice.SpeechVoiceService) *ChatListener {
 	return c
 }
 
-func (l *ChatListener) Handle() {
+func (l *TwitchChatListener) Handle() {
 	l.isFirst = true
 	for range l.chCompleted {
 		l.mx.RLock()
@@ -42,7 +47,7 @@ func (l *ChatListener) Handle() {
 	}
 }
 
-func (l *ChatListener) OnShardMessage(_ int, message irc.ChatMessage) {
+func (l *TwitchChatListener) OnShardMessage(_ int, message irc.ChatMessage) {
 	text := message.Sender.DisplayName + " say that " + message.Text + " !"
 	fmt.Println("send", text)
 	l.messagesChannel <- model.Message{From: message.Sender.Username, Text: text}

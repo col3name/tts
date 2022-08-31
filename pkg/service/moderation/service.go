@@ -42,7 +42,7 @@ var mostPopularTLD = []string{
 	".nl",
 }
 
-func NewDefaultFilter(moderationPair, ignoreString string, users []string) Filter {
+func NewMessageFilter(moderationPair, ignoreString string, users []string) Filter {
 	baseFilter := NewBaseFilter(moderationPair, ignoreString)
 	urlFilter := NewUrlFilterDecorator(baseFilter)
 	userFilter := NewUserFilterDecorator(urlFilter, users)
