@@ -1,13 +1,12 @@
 package handler
 
 import (
-	"fmt"
 	"github.com/Adeithe/go-twitch/irc"
 	"github.com/col3name/tts/pkg/model"
 	"github.com/col3name/tts/pkg/service/voice"
 	"github.com/col3name/tts/pkg/util/separator"
+	log "github.com/sirupsen/logrus"
 	"sync"
-	"time"
 )
 
 type ChatListener interface {
@@ -39,12 +38,13 @@ func (t *TwitchChatListener) Handle() {
 	for range t.chCompleted {
 		t.mx.RLock()
 		message := <-t.messagesChannel
-		fmt.Println("start", time.Now(), message)
+		log.Println("start", message)
 		err := t.speakService.Speak(message)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
+		} else {
+			log.Println("completed", message)
 		}
-		fmt.Println("complete", time.Now(), message)
 		t.chCompleted <- true
 		t.mx.RUnlock()
 	}
@@ -52,7 +52,7 @@ func (t *TwitchChatListener) Handle() {
 
 func (t *TwitchChatListener) OnShardMessage(_ int, message irc.ChatMessage) {
 	text := message.Sender.DisplayName + separator.Space + t.greetingText + separator.Space + message.Text + " !"
-	fmt.Println("send", text)
+	log.Println("send", text)
 	t.messagesChannel <- model.Message{From: message.Sender.Username, Text: text}
 	if t.isFirst {
 		t.chCompleted <- true
