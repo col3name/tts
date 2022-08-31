@@ -10,17 +10,17 @@ import (
 )
 
 type ChatListener struct {
-	speakService voice.SpeechVoiceService
-	ch           chan model.Message
-	chCompleted  chan bool
-	isFirst      bool
-	mx           sync.RWMutex
+	speakService    voice.SpeechVoiceService
+	messagesChannel chan model.Message
+	chCompleted     chan bool
+	isFirst         bool
+	mx              sync.RWMutex
 }
 
 func NewChatListener(service voice.SpeechVoiceService) *ChatListener {
 	c := new(ChatListener)
 	c.speakService = service
-	c.ch = make(chan model.Message, 100)
+	c.messagesChannel = make(chan model.Message, 100)
 	c.chCompleted = make(chan bool, 1)
 	c.isFirst = true
 	return c
@@ -30,7 +30,7 @@ func (l *ChatListener) Handle() {
 	l.isFirst = true
 	for range l.chCompleted {
 		l.mx.RLock()
-		message := <-l.ch
+		message := <-l.messagesChannel
 		fmt.Println("start", time.Now(), message)
 		err := l.speakService.Speak(message)
 		if err != nil {
@@ -43,9 +43,9 @@ func (l *ChatListener) Handle() {
 }
 
 func (l *ChatListener) OnShardMessage(_ int, message irc.ChatMessage) {
-	s := message.Sender.DisplayName + " say that " + message.Text + " !"
-	fmt.Println("send", s)
-	l.ch <- model.Message{From: message.Sender.Username, Text: s}
+	text := message.Sender.DisplayName + " say that " + message.Text + " !"
+	fmt.Println("send", text)
+	l.messagesChannel <- model.Message{From: message.Sender.Username, Text: text}
 	if l.isFirst {
 		l.chCompleted <- true
 		l.isFirst = false
