@@ -2,7 +2,9 @@ package moderation
 
 import (
 	"fmt"
+	"github.com/col3name/tts/pkg/util/separator"
 	"github.com/stretchr/testify/assert"
+	"strings"
 	"testing"
 )
 
@@ -18,9 +20,10 @@ func TestDefaultMapFilterBuilder(t *testing.T) {
 }
 
 func TestName12(t *testing.T) {
-	var result string
+	var result strings.Builder
 	for key := range bannedWord {
-		result += key + ","
+		result.WriteString(key)
+		result.WriteString(separator.Item)
 	}
 	fmt.Println(result)
 }

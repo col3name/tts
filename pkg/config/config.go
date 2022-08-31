@@ -2,7 +2,9 @@ package config
 
 import (
 	"github.com/col3name/tts/pkg/service/voice"
+	"github.com/col3name/tts/pkg/util/number"
 	"github.com/col3name/tts/pkg/util/separator"
+	str "github.com/col3name/tts/pkg/util/stringss"
 	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
 	"os"
@@ -66,14 +68,14 @@ func (c *Config) Parse() {
 
 func (c *Config) setVolume() {
 	volumeString := os.Getenv(EnvVolume)
-	if len(volumeString) == 0 {
+	if str.Empty(volumeString) {
 		return
 	}
 	num, err := strconv.ParseFloat(volumeString, 10)
 	if err != nil {
 		log.Fatal(MessageInvalidVolume)
 	}
-	if num < 0 || num > 2.0 {
+	if !number.InRange(num, 0, 2) {
 		log.Fatal(MessageInvalidVolume)
 	}
 	c.Volume = num
@@ -96,7 +98,7 @@ func (c *Config) setLanguageDetectorEnabled() {
 
 func (c *Config) setChannelsList() {
 	channels := os.Getenv(EnvTwitchChannel)
-	if len(channels) == 0 {
+	if str.Empty(channels) {
 		log.Fatal(MessageFailedLoadConfigFile)
 	}
 	c.ChannelsList = strings.Split(channels, separator.Pair)
@@ -104,7 +106,7 @@ func (c *Config) setChannelsList() {
 
 func (c *Config) setServeRestAddress() {
 	serveRestAddress := os.Getenv(EnvRestAddress)
-	if len(c.RestAddress) != 0 {
+	if !str.Empty(c.RestAddress) {
 		c.RestAddress = serveRestAddress
 	}
 }

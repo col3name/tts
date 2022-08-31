@@ -5,6 +5,8 @@ import (
 	"github.com/col3name/tts/pkg/model"
 	"github.com/col3name/tts/pkg/repo"
 	"github.com/col3name/tts/pkg/service/moderation"
+	"github.com/col3name/tts/pkg/util/separator"
+	"github.com/col3name/tts/pkg/util/stringss"
 	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
@@ -14,9 +16,9 @@ func MakeTest(t *testing.T, repo repo.SettingRepo) {
 	filterMap := moderation.DefaultFilterMap.Range()
 	ignoreWords := ""
 	for key := range filterMap {
-		ignoreWords += key + ","
+		ignoreWords += key + separator.Item
 	}
-	ignoreWords = ignoreWords[:len(ignoreWords)-1]
+	ignoreWords = stringss.DeleteLast(ignoreWords)
 
 	settingId := 1
 	in := model.SettingDB{
@@ -35,7 +37,7 @@ func MakeTest(t *testing.T, repo repo.SettingRepo) {
 	assert.NoError(t, err)
 	reflect.DeepEqual(in, out)
 	fmt.Println(out)
-	setting := model.Setting{}
+	setting := moderation.Setting{}
 	setting.Id = out.Id
 	setting.Volume = int(out.Volume)
 	setting.Language = out.Language

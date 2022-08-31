@@ -3,6 +3,7 @@ package moderation
 import (
 	"github.com/col3name/tts/pkg/model"
 	"github.com/col3name/tts/pkg/util/separator"
+	str "github.com/col3name/tts/pkg/util/stringss"
 	"net/url"
 	"strings"
 )
@@ -104,7 +105,7 @@ func (f *TrimFilterDecorator) Moderate(message *model.Message) (string, error) {
 	text := message.Text
 	text = strings.Trim(text, separator.Space)
 	fromLen := len(message.From)
-	if fromLen > len(text) && len(text) == 0 {
+	if fromLen > len(text) && str.Empty(text) {
 		return "", model.ErrorInvalidValue
 	}
 	check := text[fromLen:]
@@ -132,14 +133,15 @@ func (f *UrlFilterDecorator) SetFilterMap(filterMap FilterMap) {
 }
 
 func (f *UrlFilterDecorator) Moderate(message *model.Message) (string, error) {
-
 	words := strings.Split(message.Text, separator.Space)
 	var text strings.Builder
+
 	for _, word := range words {
 		if f.isValidWord(word) {
 			text.WriteString(word + separator.Space)
 		}
 	}
+
 	message.Text = text.String()
 	return f.filter.Moderate(message)
 }
@@ -155,7 +157,7 @@ func (f *UrlFilterDecorator) isValidUrl(value string) bool {
 	}
 
 	u, err := url.Parse(value)
-	return err == nil && u.Scheme != "" && u.Host != ""
+	return err == nil && !str.Empty(u.Scheme) && !str.Empty(u.Host)
 }
 
 func (f *UrlFilterDecorator) isContainsTopLevelDomain(value string) bool {
@@ -175,7 +177,7 @@ const defaultIgnore = "shit,slut,spunk,whore,fuck,nigger,sex,pussy,queer,sh1t,wa
 
 func NewBaseFilter(moderationPair, ignoreString string) *BaseFilter {
 	f := new(BaseFilter)
-	if len(moderationPair) > 0 || len(ignoreString) > 0 {
+	if !str.Empty(moderationPair) || !str.Empty(ignoreString) {
 		builder := NewFilterMapBuilder()
 		f.filterMap = *builder.Build(moderationPair, ignoreString+defaultIgnore)
 	} else {
@@ -189,7 +191,7 @@ func (f *BaseFilter) SetFilterMap(filterMap FilterMap) {
 }
 
 func (f *BaseFilter) Moderate(message *model.Message) (string, error) {
-	if len(message.Text) == 0 {
+	if str.Empty(message.Text) {
 		return message.Text, model.ErrorInvalidValue
 	}
 	words := strings.Split(message.Text, separator.Space)

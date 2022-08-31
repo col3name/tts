@@ -1,6 +1,9 @@
 package voice
 
-var supportedLanguage = []string{"en",
+import "github.com/col3name/tts/pkg/util/array"
+
+var supportedLanguage = []string{
+	"en",
 	"en-UK",
 	"en-AU",
 	"ja",
@@ -64,10 +67,5 @@ var supportedLanguage = []string{"en",
 	"bs"}
 
 func IsSupported(language string) bool {
-	for _, item := range supportedLanguage {
-		if item == language {
-			return true
-		}
-	}
-	return false
+	return array.Contains(supportedLanguage, language)
 }

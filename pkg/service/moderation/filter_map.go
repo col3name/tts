@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/col3name/tts/pkg/util/array"
 	"github.com/col3name/tts/pkg/util/separator"
+	"github.com/col3name/tts/pkg/util/stringss"
 	"strings"
 )
 
@@ -27,11 +28,14 @@ func (m *FilterMap) Range() map[string]string {
 }
 
 func (m *FilterMap) String() string {
-	var result string
+	var result strings.Builder
 	for key, value := range m.data {
-		result += key + ":" + value + ","
+		result.WriteString(key)
+		result.WriteString(separator.Pair)
+		result.WriteString(value)
+		result.WriteString(separator.Item)
 	}
-	return result[:len(result)-1]
+	return stringss.DeleteLast(result.String())
 }
 
 func (m *FilterMap) Set(from, to string) {
@@ -155,8 +159,7 @@ func (b *FilterMapBuilderImpl) fillFilterMap(filterMap *FilterMap, value string,
 	itemArray := array.FromString(value)
 
 	for _, item := range itemArray {
-		err := fn(filterMap, item)
-		if err != nil {
+		if err := fn(filterMap, item); err != nil {
 			return ErrorInvalidValue
 		}
 	}

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/col3name/tts/pkg/util/container"
 	"github.com/col3name/tts/pkg/util/separator"
+	"github.com/col3name/tts/pkg/util/stringss"
 	"strings"
 )
 
@@ -29,37 +30,24 @@ type SettingDB struct {
 
 func (s *SettingDB) SetReplacementWordPair(filter container.Map) {
 	filterMap := filter.Range()
-	var textBuilder strings.Builder
+	var result strings.Builder
 	for key, value := range filterMap {
-		textBuilder.WriteString(key)
-		textBuilder.WriteString(separator.Pair)
-		textBuilder.WriteString(value)
-		textBuilder.WriteString(separator.Item)
+		result.WriteString(key)
+		result.WriteString(separator.Pair)
+		result.WriteString(value)
+		result.WriteString(separator.Item)
 	}
-	text := textBuilder.String()
-	s.ReplacementWordPair = text[:len(text)-1]
+	s.ReplacementWordPair = stringss.DeleteLast(result.String())
 }
 
 func (s *SettingDB) SetIgnoreWords(words []string) {
-	var result string
-	for _, item := range words {
-		result += item + separator.Item
-	}
-	s.IgnoreWords = result[:len(result)-1]
+	s.IgnoreWords = stringss.FromArray(words)
 }
 
 func (s *SettingDB) SetUserBanList(users []string) {
-	var result string
-	for _, item := range users {
-		result += item + separator.Item
-	}
-	s.UserBanList = result[:len(result)-1]
+	s.UserBanList = stringss.FromArray(users)
 }
 
-func (s *SettingDB) SetChannelsToListen(list []string) {
-	var result string
-	for _, item := range list {
-		result += item + separator.Item
-	}
-	s.ChannelsToListen = result[:len(result)-1]
+func (s *SettingDB) SetChannelsToListen(channels []string) {
+	s.ChannelsToListen = stringss.FromArray(channels)
 }

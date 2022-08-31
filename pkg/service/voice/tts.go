@@ -8,6 +8,8 @@ import (
 	lang_detection "github.com/col3name/tts/pkg/service/lang-detection"
 	"github.com/col3name/tts/pkg/service/moderation"
 	"github.com/col3name/tts/pkg/util/array"
+	"github.com/col3name/tts/pkg/util/number"
+	"github.com/col3name/tts/pkg/util/stringss"
 )
 
 type SpeechVoiceDTO struct {
@@ -35,14 +37,14 @@ func NewSpeech(language string, volume float64) gotts.Speech {
 }
 
 func NewGoTtsService(language string, filter moderation.Filter, volume float64, repo repo.SettingRepo, langDetectorEnabled bool, langDetector lang_detection.LanguageDetectionService) *GoTtsService {
-	s := new(GoTtsService)
-	if len(language) == 0 {
-		language = voices.English
-	}
-	if volume < 0 || volume > 15 {
+	if !number.InRange(volume, 0, 15) {
 		return nil
 	}
+	if stringss.Empty(language) {
+		language = voices.English
+	}
 
+	s := new(GoTtsService)
 	s.volume = volume
 	s.speech = NewSpeech(language, volume)
 	s.language = language
