@@ -1,10 +1,10 @@
-import axios from "axios";
-import {listPairToString, stringToArray, stringToListPair} from "../util/util";
+import axios from "axios"
+import {listPairToString, stringToArray, stringToListPair} from "../util/util"
 
-const url = 'http://localhost:8000/api/v1/settings';
+const url = 'http://localhost:8000/api/v1/settings'
 
 const getSettings = async () => {
-  const resp = await axios.get(url);
+  const resp = await axios.get(url)
   if (resp.status !== 200) {
     return []
   }
@@ -18,7 +18,7 @@ const getSettings = async () => {
     ReplacementWordPair: stringToListPair(setting.ReplacementWordPair),
     UserBanList: stringToArray(setting.UserBanList),
     Volume: setting.Volume,
-  };
+  }
 }
 
 const saveSettingsReq = async (data) => {
@@ -31,19 +31,20 @@ const saveSettingsReq = async (data) => {
     UserBanList: data.UserBanList.join(),
     ChannelsToListen: data.ChannelsToListen,
     Volume: data.Volume,
-  };
-  return await axios.post(url, JSON.stringify(setting));
+  }
+  return await axios.post(url, JSON.stringify(setting))
 }
 
-const saveSettings = (setting) => {
-  saveSettingsReq(setting).then(resp => {
+const saveSettings = async (setting) => {
+  try {
+    const resp = await saveSettingsReq(setting)
     if (resp.status === 200) {
-      console.log(resp);
+      console.log(resp)
     }
-  }).catch(err => [
-    console.log(err)
-  ])
-};
+  } catch (e) {
+    console.log(e)
+  }
+}
 
 
 export {getSettings, saveSettings}

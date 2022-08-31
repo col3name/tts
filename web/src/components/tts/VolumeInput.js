@@ -1,9 +1,9 @@
-import React from "react";
+import React from "react"
 
-function VolumeInput({volume, onUpdateVolume}) {
+const VolumeInput = ({volume, onUpdateVolume}) => {
   const onChange = (e) => {
     onUpdateVolume(e.target.valueAsNumber)
-  };
+  }
 
   return <div>
     <label>
@@ -14,4 +14,4 @@ function VolumeInput({volume, onUpdateVolume}) {
   </div>
 }
 
-export default VolumeInput;
+export default VolumeInput

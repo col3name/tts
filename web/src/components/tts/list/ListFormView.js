@@ -1,24 +1,19 @@
-import ListItemForm from "./ListItemForm";
-import ListView from "./ListView";
-import React from "react";
-import {appendToList, deleteByIndex} from "../../../util/util";
+import ListItemForm from "./ListItemForm"
+import ListView from "./ListView"
+import React from "react"
 
-export default function ListFormView({title, label, list, minLength, onUpdate}) {
-
-  const onDeleteItem = (index) => onUpdate(deleteByIndex(index, list));
+const ListFormView = ({title, label, list, minLength, onAddItem, onRemoveItem}) => {
+  const onDeleteItem = (index) => onRemoveItem(index)
 
   const onCreateItem = (item) => {
-    if (item.length < minLength) {
-      return
+    if (item.length >= minLength && !list.includes(item.toLowerCase())) {
+      onAddItem(item)
     }
-    if (!list.includes(item.toLowerCase())) {
-      onUpdate(appendToList(item, list))
-    }
-  };
+  }
 
   return (
     <div>
-      <p>{title}</p>
+      <p>{title}: {list === undefined ? '' : list.length}</p>
       <ListItemForm label={label}
                     onSubmit={onCreateItem}/>
       <ListView data={list}
@@ -26,4 +21,6 @@ export default function ListFormView({title, label, list, minLength, onUpdate}) 
       />
     </div>
   )
-};
+}
+
+export default ListFormView
