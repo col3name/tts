@@ -2,7 +2,8 @@ package moderation
 
 import (
 	"errors"
-	"github.com/col3name/tts/pkg/util"
+	"github.com/col3name/tts/pkg/util/array"
+	"github.com/col3name/tts/pkg/util/separator"
 	"strings"
 )
 
@@ -151,7 +152,7 @@ func (b *FilterMapBuilderImpl) Build(wordPairs string, ignoreString string) *Fil
 }
 
 func (b *FilterMapBuilderImpl) fillFilterMap(filterMap *FilterMap, value string, fn func(filterMap *FilterMap, pair string) error) error {
-	itemArray := util.StringOfEnumerationToArray(value)
+	itemArray := array.FromString(value)
 
 	for _, item := range itemArray {
 		err := fn(filterMap, item)
@@ -164,7 +165,7 @@ func (b *FilterMapBuilderImpl) fillFilterMap(filterMap *FilterMap, value string,
 }
 
 func (b *FilterMapBuilderImpl) handleWordPair(filterMap *FilterMap, pair string) error {
-	splitPair := strings.Split(pair, ":")
+	splitPair := strings.Split(pair, separator.Pair)
 	if len(splitPair) != 2 {
 		return ErrorInvalidValue
 	}

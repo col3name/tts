@@ -7,7 +7,7 @@ import (
 	"github.com/col3name/tts/pkg/repo"
 	lang_detection "github.com/col3name/tts/pkg/service/lang-detection"
 	"github.com/col3name/tts/pkg/service/moderation"
-	"github.com/col3name/tts/pkg/util"
+	"github.com/col3name/tts/pkg/util/array"
 )
 
 type SpeechVoiceDTO struct {
@@ -113,7 +113,7 @@ func (s *GoTtsService) updateVolume(settingDb *model.SettingDB) {
 }
 
 func (s *GoTtsService) updateFilter(settingDb *model.SettingDB) {
-	users := util.StringOfEnumerationToArray(settingDb.UserBanList)
+	users := array.FromString(settingDb.UserBanList)
 	s.filter = moderation.NewMessageFilter(settingDb.ReplacementWordPair, settingDb.IgnoreWords, users)
 }
 

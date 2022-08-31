@@ -1,7 +1,7 @@
 package moderation
 
 import (
-	"github.com/col3name/tts/pkg/util"
+	"github.com/col3name/tts/pkg/util/array"
 	"github.com/col3name/tts/pkg/util/container"
 	"github.com/col3name/tts/pkg/util/separator"
 	"strings"
@@ -23,11 +23,11 @@ func (s *Setting) SetIgnoreWords(value string) {
 }
 
 func (s *Setting) StoreIgnoreWord(word string) {
-	s.IgnoreWords = util.ArrayStore(s.IgnoreWords, word)
+	s.IgnoreWords = array.Store(s.IgnoreWords, word)
 }
 
 func (s *Setting) DeleteIgnoreWord(word string) {
-	s.IgnoreWords = util.ArrayDelete(s.IgnoreWords, word)
+	s.IgnoreWords = array.Delete(s.IgnoreWords, word)
 }
 
 func (s *Setting) SetUserBanList(value string) {
@@ -35,11 +35,11 @@ func (s *Setting) SetUserBanList(value string) {
 }
 
 func (s *Setting) StoreUserBanList(user string) {
-	s.UserBanList = util.ArrayStore(s.UserBanList, user)
+	s.UserBanList = array.Store(s.UserBanList, user)
 }
 
 func (s *Setting) DeleteUserBanList(user string) {
-	s.UserBanList = util.ArrayDelete(s.UserBanList, user)
+	s.UserBanList = array.Delete(s.UserBanList, user)
 }
 
 func (s *Setting) SetChannelsToListen(value string) {
@@ -47,11 +47,11 @@ func (s *Setting) SetChannelsToListen(value string) {
 }
 
 func (s *Setting) StoreChannelsToListen(user string) {
-	s.ChannelsToListen = util.ArrayStore(s.ChannelsToListen, user)
+	s.ChannelsToListen = array.Store(s.ChannelsToListen, user)
 }
 
 func (s *Setting) DeleteChannelsToListen(user string) {
-	s.ChannelsToListen = util.ArrayDelete(s.ChannelsToListen, user)
+	s.ChannelsToListen = array.Delete(s.ChannelsToListen, user)
 }
 
 func (s *Setting) SetReplacementPair(key, value string) {
