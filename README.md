@@ -1,10 +1,6 @@
-### Simple bot for twitch, who can speech message from chat, NO required login
+# Simple bot for twitch, who can speech message from chat, NO required login
 
 ### Feature
-
-
-
-
 - Word replacements
 - Word ignore
 - Url ignore
@@ -23,6 +19,9 @@
   ne, pt, ro, si, sr, su, ta, te, tl, ur, zh, sw, sq, my, mk, hy, hr, eo, bs
 - Supported automatic language detection: English (en), Spanish (es), French (fr), German (de), Russian (ru), Chinese (
   zh)
+
+## How Works
+![drawing](docs/Arch-Diagram.jpg)
 
 ## Build
 
@@ -46,3 +45,4 @@ GOOS=darwin GOARCH=arm64
 ## Test
 
 ```make test```
+
