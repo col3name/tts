@@ -37,7 +37,7 @@ func MakeTest(t *testing.T, repo repo.SettingRepo) {
 	fmt.Println(out)
 	setting := model.Setting{}
 	setting.Id = out.Id
-	setting.Volume = out.Volume
+	setting.Volume = int(out.Volume)
 	setting.Language = out.Language
 	setting.LanguageDetectorEnabled = out.LanguageDetectorEnabled
 	setting.SetReplacementWordPair(out.ReplacementWordPair)

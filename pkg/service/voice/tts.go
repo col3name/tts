@@ -15,7 +15,7 @@ type SpeechVoiceDTO struct {
 	Text string
 }
 type SpeechVoiceService interface {
-	Speak(text *model.Message) error
+	Speak(text model.Message) error
 }
 
 type GoTtsService struct {
@@ -51,12 +51,12 @@ func NewGoTtsService(language string, filter moderation.Filter, volume float64, 
 	return s
 }
 
-func (s *GoTtsService) Speak(message *model.Message) error {
+func (s *GoTtsService) Speak(message model.Message) error {
 	err := s.updateSettings(message.Text)
 	if err != nil {
 		return err
 	}
-	text, err := s.moderateMessageFromUser(message)
+	text, err := s.moderateMessageFromUser(&message)
 	if err != nil {
 		return err
 	}

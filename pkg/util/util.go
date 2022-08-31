@@ -1,12 +1,12 @@
 package util
 
 import (
-	"github.com/col3name/tts/pkg/model"
+	"github.com/col3name/tts/pkg/util/separator"
 	"strings"
 )
 
 func StringOfEnumerationToArray(str string) []string {
-	return strings.Split(str, model.SeparatorOfPair)
+	return strings.Split(str, separator.SeparatorOfPair)
 }
 
 func FindInArray(arr []string, val string) int {

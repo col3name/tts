@@ -2,6 +2,7 @@ package moderation
 
 import (
 	"github.com/col3name/tts/pkg/model"
+	"github.com/col3name/tts/pkg/util/separator"
 	"net/url"
 	"strings"
 )
@@ -101,7 +102,7 @@ func (f *TrimFilterDecorator) SetFilterMap(filterMap FilterMap) {
 
 func (f *TrimFilterDecorator) Moderate(message *model.Message) (string, error) {
 	text := message.Text
-	text = strings.Trim(text, model.Space)
+	text = strings.Trim(text, separator.Space)
 	fromLen := len(message.From)
 	if fromLen > len(text) && len(text) == 0 {
 		return "", model.ErrorInvalidValue
@@ -132,11 +133,11 @@ func (f *UrlFilterDecorator) SetFilterMap(filterMap FilterMap) {
 
 func (f *UrlFilterDecorator) Moderate(message *model.Message) (string, error) {
 
-	words := strings.Split(message.Text, model.Space)
+	words := strings.Split(message.Text, separator.Space)
 	var text strings.Builder
 	for _, word := range words {
 		if f.isValidWord(word) {
-			text.WriteString(word + model.Space)
+			text.WriteString(word + separator.Space)
 		}
 	}
 	message.Text = text.String()
@@ -191,7 +192,7 @@ func (f *BaseFilter) Moderate(message *model.Message) (string, error) {
 	if len(message.Text) == 0 {
 		return message.Text, model.ErrorInvalidValue
 	}
-	words := strings.Split(message.Text, model.Space)
+	words := strings.Split(message.Text, separator.Space)
 	var text strings.Builder
 	var value string
 	var ok bool
@@ -203,7 +204,7 @@ func (f *BaseFilter) Moderate(message *model.Message) (string, error) {
 		} else {
 			text.WriteString(word)
 		}
-		text.WriteString(model.Space)
+		text.WriteString(separator.Space)
 	}
 
 	return text.String(), nil

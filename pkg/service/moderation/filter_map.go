@@ -1,7 +1,7 @@
 package moderation
 
 import (
-	"github.com/col3name/tts/pkg/model"
+	"errors"
 	"github.com/col3name/tts/pkg/util"
 	"strings"
 )
@@ -133,6 +133,10 @@ func NewFilterMapBuilder() *FilterMapBuilderImpl {
 	return &FilterMapBuilderImpl{}
 }
 
+var (
+	ErrorInvalidValue = errors.New("InvalidValue")
+)
+
 func (b *FilterMapBuilderImpl) Build(wordPairs string, ignoreString string) *FilterMap {
 	filterMap := NewFilterMap()
 	err := b.fillFilterMap(filterMap, wordPairs, b.handleWordPair)
@@ -152,7 +156,7 @@ func (b *FilterMapBuilderImpl) fillFilterMap(filterMap *FilterMap, value string,
 	for _, item := range itemArray {
 		err := fn(filterMap, item)
 		if err != nil {
-			return model.ErrorInvalidValue
+			return ErrorInvalidValue
 		}
 	}
 
@@ -162,7 +166,7 @@ func (b *FilterMapBuilderImpl) fillFilterMap(filterMap *FilterMap, value string,
 func (b *FilterMapBuilderImpl) handleWordPair(filterMap *FilterMap, pair string) error {
 	splitPair := strings.Split(pair, ":")
 	if len(splitPair) != 2 {
-		return model.ErrorInvalidValue
+		return ErrorInvalidValue
 	}
 	filterMap.Set(strings.ToLower(splitPair[0]), strings.ToLower(splitPair[1]))
 	return nil
