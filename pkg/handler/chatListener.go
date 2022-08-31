@@ -5,6 +5,7 @@ import (
 	"github.com/Adeithe/go-twitch/irc"
 	"github.com/col3name/tts/pkg/model"
 	"github.com/col3name/tts/pkg/service/voice"
+	"github.com/col3name/tts/pkg/util/separator"
 	"sync"
 	"time"
 )
@@ -15,44 +16,46 @@ type ChatListener interface {
 }
 
 type TwitchChatListener struct {
+	isFirst         bool
+	greetingText    string
+	mx              sync.RWMutex
 	speakService    voice.SpeechVoiceService
 	messagesChannel chan model.Message
 	chCompleted     chan bool
-	isFirst         bool
-	mx              sync.RWMutex
 }
 
-func NewChatListener(service voice.SpeechVoiceService) *TwitchChatListener {
+func NewChatListener(service voice.SpeechVoiceService, greetingText string) *TwitchChatListener {
 	c := new(TwitchChatListener)
 	c.speakService = service
 	c.messagesChannel = make(chan model.Message, 100)
 	c.chCompleted = make(chan bool, 1)
 	c.isFirst = true
+	c.greetingText = greetingText
 	return c
 }
 
-func (l *TwitchChatListener) Handle() {
-	l.isFirst = true
-	for range l.chCompleted {
-		l.mx.RLock()
-		message := <-l.messagesChannel
+func (t *TwitchChatListener) Handle() {
+	t.isFirst = true
+	for range t.chCompleted {
+		t.mx.RLock()
+		message := <-t.messagesChannel
 		fmt.Println("start", time.Now(), message)
-		err := l.speakService.Speak(message)
+		err := t.speakService.Speak(message)
 		if err != nil {
 			fmt.Println(err)
 		}
 		fmt.Println("complete", time.Now(), message)
-		l.chCompleted <- true
-		l.mx.RUnlock()
+		t.chCompleted <- true
+		t.mx.RUnlock()
 	}
 }
 
-func (l *TwitchChatListener) OnShardMessage(_ int, message irc.ChatMessage) {
-	text := message.Sender.DisplayName + " say that " + message.Text + " !"
+func (t *TwitchChatListener) OnShardMessage(_ int, message irc.ChatMessage) {
+	text := message.Sender.DisplayName + separator.Space + t.greetingText + separator.Space + message.Text + " !"
 	fmt.Println("send", text)
-	l.messagesChannel <- model.Message{From: message.Sender.Username, Text: text}
-	if l.isFirst {
-		l.chCompleted <- true
-		l.isFirst = false
+	t.messagesChannel <- model.Message{From: message.Sender.Username, Text: text}
+	if t.isFirst {
+		t.chCompleted <- true
+		t.isFirst = false
 	}
 }

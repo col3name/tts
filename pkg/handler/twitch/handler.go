@@ -42,7 +42,7 @@ func (t *MessageHandler) Handle() {
 }
 
 func (t *MessageHandler) run() {
-	chatListener := t.setupChatListener(t.setting, t.config, t.settingRepo)
+	chatListener := t.setupChatListener()
 	t.shards.OnShardMessage(chatListener.OnShardMessage)
 	go chatListener.Handle()
 
@@ -60,9 +60,13 @@ func (t *MessageHandler) stop() {
 	t.shards.Close()
 }
 
-func (t *MessageHandler) setupChatListener(setting *model.SettingDB, config *config.Config, settingRepo repo.SettingRepo) handler.ChatListener {
-	messageFilter := moderation.NewMessageFilter(setting.ReplacementWordPair, setting.IgnoreWords, config.UserBanList)
+func (t *MessageHandler) setupChatListener() handler.ChatListener {
+	settingRepo := t.settingRepo
+	setting := t.setting
+	banList := t.config.UserBanList
+
+	messageFilter := moderation.NewMessageFilter(setting.ReplacementWordPair, setting.IgnoreWords, banList)
 	linguaDetectionService := langdetection.NewLinguaDetectionService(langdetection.DefaultLanguages)
 	ttsService := voice.NewGoTtsService(setting.Language, messageFilter, setting.Volume, settingRepo, setting.LanguageDetectorEnabled, linguaDetectionService)
-	return handler.NewChatListener(ttsService)
+	return handler.NewChatListener(ttsService, t.config.GreetingText)
 }

@@ -26,6 +26,7 @@ const (
 	EnvLanguage          = "LANGUAGE"
 	EnvModeration        = "MODERATION"
 	EnvIgnoredWords      = "IGNORE"
+	EnvGreeting          = "GREETING"
 )
 
 type Config struct {
@@ -37,6 +38,7 @@ type Config struct {
 	Language            string
 	ModerationWordPairs string
 	IgnoreWords         string
+	GreetingText        string
 	ChannelsList        []string
 	UserBanList         []string
 }
@@ -48,6 +50,7 @@ func NewConfig() *Config {
 		WebViewAddress:      "http://localhost:3000",
 		StaticApiAddress:    ":3000",
 		RestAddress:         ":8000",
+		GreetingText:        "say that",
 	}
 }
 
@@ -64,6 +67,7 @@ func (c *Config) Parse() {
 	c.setLanguageDetectorEnabled()
 	c.setUserBanList()
 	c.setVolume()
+	c.setGreeting()
 }
 
 func (c *Config) setVolume() {
@@ -119,4 +123,11 @@ func (c *Config) setModerationWordPair() {
 
 func (c *Config) setIgnoreWords() {
 	c.IgnoreWords = os.Getenv(EnvIgnoredWords)
+}
+
+func (c *Config) setGreeting() {
+	value := os.Getenv(EnvGreeting)
+	if !str.Empty(value) {
+		c.GreetingText = value
+	}
 }
