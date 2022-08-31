@@ -2,13 +2,13 @@ package config
 
 import (
 	"github.com/col3name/tts/pkg/service/voice"
+	"github.com/col3name/tts/pkg/util/boolean"
 	"github.com/col3name/tts/pkg/util/number"
 	"github.com/col3name/tts/pkg/util/separator"
 	str "github.com/col3name/tts/pkg/util/stringss"
 	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
 	"os"
-	"strconv"
 	"strings"
 )
 
@@ -71,7 +71,7 @@ func (c *Config) setVolume() {
 	if str.Empty(volumeString) {
 		return
 	}
-	num, err := strconv.ParseFloat(volumeString, 10)
+	num, err := number.ParseFloat64(volumeString)
 	if err != nil {
 		log.Fatal(MessageInvalidVolume)
 	}
@@ -88,12 +88,7 @@ func (c *Config) setUserBanList() {
 }
 
 func (c *Config) setLanguageDetectorEnabled() {
-	langDetectorEnabledString := os.Getenv(EnvLangDetectEnabled)
-	if langDetectorEnabledString == "" || langDetectorEnabledString == "false" {
-		c.LangDetectorEnabled = false
-	} else if langDetectorEnabledString == "true" {
-		c.LangDetectorEnabled = true
-	}
+	c.LangDetectorEnabled = boolean.FromString(os.Getenv(EnvLangDetectEnabled))
 }
 
 func (c *Config) setChannelsList() {

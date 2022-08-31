@@ -22,7 +22,7 @@ func Contains(array []string, value string) bool {
 
 func Store(array []string, value string) []string {
 	index := Find(array, value)
-	if index != NotFound {
+	if index == NotFound {
 		array = append(array, value)
 	} else {
 		array[index] = value
