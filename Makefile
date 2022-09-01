@@ -7,8 +7,8 @@ build: fmt
 releaseWin: build
 	rar a -r windows-amd64.rar main.exe
 buildLinux: fmt
-	set GOOS=linux
-	set GOARCH=amd64
+	export GOOS=linux
+	export GOARCH=amd64
 	go build -o main main.go
 releaseLinux: buildLinux
 	rar a -r linux-amd64.rar main
