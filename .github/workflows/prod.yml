@@ -31,7 +31,7 @@ jobs:
 
       - name: Run Test
         run: |
-          export CI=true
+          set CI=true
           make test
 
       - name: Build
