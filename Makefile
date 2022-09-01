@@ -3,6 +3,8 @@ fmt:
 lint:
 	golangci-lint run
 build: fmt
+	set GOOS=windows
+	set GOARCH=amd64
 	go build -o main.exe main.go
 releaseWin: build
 	rar a -r windows-amd64.rar main.exe
