@@ -1,4 +1,5 @@
 # Simple bot for twitch, who can speech message from chat, NO required login
+![CI passing](https://github.com/col3name/tts/actions/workflows/prod.yml/badge.svg)
 
 ### Feature
 - Word replacements
