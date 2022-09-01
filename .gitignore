@@ -3,6 +3,7 @@ audio
 *.exe
 .env
 *.rar
+*.sum
 main
 web/node_modules
 web/build
