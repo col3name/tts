@@ -1,6 +1,6 @@
 module github.com/col3name/tts
 
-go 1.17
+go 1.18
 
 require (
 	github.com/Adeithe/go-twitch v0.1.1
