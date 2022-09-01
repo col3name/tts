@@ -22,22 +22,25 @@ func TestName3(t *testing.T) {
 	filterDefault := NewBaseFilter("", "")
 	urlFilter := NewUrlFilterDecorator(filterDefault)
 	type testData struct {
+		name     string
 		input    *model.Message
 		expected string
 	}
 
 	tests := []testData{
-		{expected: "http:::/not.valid/a//a??a?b=&&c#hi  ", input: &model.Message{From: "1", Text: "http:::/not.valid/a//a??a?b=&&c#hi"}},
-		{expected: " ", input: &model.Message{From: "1", Text: "http//google.com"}},
-		{expected: " ", input: &model.Message{From: "1", Text: "google.com"}},
-		{expected: " hello  ", input: &model.Message{From: "1", Text: "wtf google.com hello"}},
-		{expected: "/foo/bar  ", input: &model.Message{From: "1", Text: "/foo/bar"}},
-		{expected: "http://  ", input: &model.Message{From: "1", Text: "http://"}},
-		{expected: " message send by me  ", input: &model.Message{From: "1", Text: " message send by me"}},
+		{name: "1", expected: "http:::/not.valid/a//a??a?b=&&c#hi  ", input: &model.Message{From: "1", Text: "http:::/not.valid/a//a??a?b=&&c#hi"}},
+		{name: "2", expected: "", input: &model.Message{From: "1", Text: "http//google.com"}},
+		{name: "3", expected: "", input: &model.Message{From: "1", Text: "google.com"}},
+		{name: "4", expected: " hello  ", input: &model.Message{From: "1", Text: "wtf google.com hello"}},
+		{name: "5", expected: "/foo/bar  ", input: &model.Message{From: "1", Text: "/foo/bar"}},
+		{name: "6", expected: "http://  ", input: &model.Message{From: "1", Text: "http://"}},
+		{name: "7", expected: " message send by me  ", input: &model.Message{From: "1", Text: " message send by me"}},
 	}
 	for _, test := range tests {
-		text, _ := urlFilter.Moderate(test.input)
-		assert.Equal(t, test.expected, text)
+		t.Run(test.name, func(t *testing.T) {
+			text, _ := urlFilter.Moderate(test.input)
+			assert.Equal(t, test.expected, text)
+		})
 	}
 }
 

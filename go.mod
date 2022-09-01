@@ -10,7 +10,7 @@ require (
 	github.com/pemistahl/lingua-go v1.0.5
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.1
-	github.com/col3name/gotts v0.0.0-20220831202729-c2b129d2dbef
+	github.com/col3name/gotts v0.0.0-20220901042548-78bd821ee14a
 )
 
 require (
